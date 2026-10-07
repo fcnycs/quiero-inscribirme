@@ -391,11 +391,11 @@
     vertical-align: -.04em;
   }
 
-  .hilo { margin-top: 1rem; line-height: 1.35; }
+  .hilo { --sangria: 1.2rem; margin-top: 1rem; line-height: 1.35; }   /* --sangria: cuánto entra cada nivel */
   .hilo .raiz { margin: 0; font-weight: 750; }
   .hilo ul { list-style: none; margin: 0; padding: 0; }
   .hilo > ul { margin-left: .3rem; }
-  .hilo li { position: relative; padding-left: 1.2rem; }
+  .hilo li { position: relative; padding-left: var(--sangria); }
   .hilo li::before {
     content: "";
     position: absolute;
@@ -409,12 +409,13 @@
     position: absolute;
     left: 0;
     top: 1.02em;
-    width: .85rem;
+    width: calc(var(--sangria) - .35rem);
     border-top: 1.5px solid var(--tinta);
   }
   .hilo li:last-child::before { bottom: auto; height: calc(1.02em + 1.5px); }
   .hilo .fila { display: flex; align-items: baseline; padding: .32em 0; }
   .hilo .marca, .hilo .fila .cod { flex: none; }
+  .hilo .fila > span:last-child { min-width: 0; overflow-wrap: break-word; }   /* un nombre largo nunca se sale de la columna */
   .hilo .cod { margin-right: .4em; color: var(--tinta-suave); }
   .hilo .repetida { display: block; font-size: .875rem; color: var(--tinta-suave); }
 
@@ -441,6 +442,10 @@
 
   @media (max-width: 30rem) {
     .consultar { width: 100%; }
+  }
+  /* Pantallas muy angostas: los hilos de muchos niveles (Medicina llega a ocho) entran menos en cada paso. */
+  @media (max-width: 21.5rem) {
+    .hilo { --sangria: .9rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -509,11 +514,11 @@
      PLANES DE ESTUDIO
      Para sumar una carrera, agregá otro bloque { ... } a esta lista.
        carrera       el nombre que se elige en la lista.
-       titulo        el título que figura en el plan.
-       cod           código de la materia en el plan, entre comillas y con el cero adelante.
+       cod           código de la materia, entre comillas y tal como figura en el plan ("05"; en Medicina, "5").
        anio          año del plan al que pertenece (1, 2, 3...).
        correlativas  los códigos de la columna de correlatividades. Sin correlativas: [].
      Opcionales:
+       titulo        el título que figura en el plan; se muestra si es distinto del nombre de la carrera.
        clave         nombre interno para lo que el plan lista sin código (va en lugar de cod).
        grupo         título del grupo en la lista, para lo que no pertenece a un año.
        requisito     lo que el plan pide con palabras; se muestra tal cual.
@@ -639,6 +644,108 @@
         { cod: "29", nombre: "Optativa",                             anio: 5, correlativas: [] },
         { cod: "30", nombre: "Trabajo Final",                        anio: 5, correlativas: [],
           requisito: "Para cursar el Trabajo Final el alumno debe tener aprobado hasta 4º año y estar cursando una asignatura de 5º año." }
+      ]
+    },
+    {
+      id: "med2025",
+      carrera: "Medicina (2025)",
+      resoluciones: [
+        "Resolución C.S. Nº 001/23"
+      ],
+      requisitoPorAnio: { 6: "Para cursar la PFO se deberá tener aprobadas las asignaturas de la Formación Básica y Clínica y las horas flexibles. Horas flexibles (220 hs): deberán acreditarse antes de iniciar la Práctica Final Obligatoria." },
+      materias: [
+        { cod: "1",  nombre: "Biología",                            anio: 1, correlativas: [] },
+        { cod: "2",  nombre: "Comprensión de Textos",               anio: 1, correlativas: [] },
+        { cod: "3",  nombre: "Anatomía I",                          anio: 1, correlativas: [] },
+        { cod: "4",  nombre: "Histología y Embriología I",          anio: 1, correlativas: [] },
+        { cod: "5",  nombre: "Biofísica",                           anio: 1, correlativas: ["1", "2", "3"] },
+        { cod: "6",  nombre: "Anatomía II",                         anio: 1, correlativas: ["1", "3", "4"] },
+        { cod: "7",  nombre: "Histología y Embriología II",         anio: 1, correlativas: ["1", "3", "4"] },
+        { cod: "8",  nombre: "Ciencias Sociales y Medicina",        anio: 1, correlativas: ["2"] },
+        { cod: "9",  nombre: "Bioquímica",                          anio: 2, correlativas: ["5", "6", "7"] },
+        { cod: "10", nombre: "Fisiología",                          anio: 2, correlativas: ["5", "6", "7"] },
+        { cod: "11", nombre: "Genética",                            anio: 2, correlativas: ["6", "7"] },
+        { cod: "12", nombre: "Inmunología",                         anio: 2, correlativas: ["6", "7"] },
+        { cod: "13", nombre: "Salud de la Comunidad",               anio: 2, correlativas: ["8"] },
+        { cod: "14", nombre: "Inglés Médico",                       anio: 2, correlativas: ["2", "11"] },
+        { cod: "15", nombre: "Microbiología",                       anio: 2, correlativas: ["11", "12"] },
+        { cod: "16", nombre: "Bioestadística",                      anio: 2, correlativas: ["5"] },
+        { cod: "17", nombre: "Patología",                           anio: 3, correlativas: ["9", "10", "11", "12"] },
+        { cod: "18", nombre: "Semiología",                          anio: 3, correlativas: ["9", "10", "11", "15"] },
+        { cod: "19", nombre: "Farmacología",                        anio: 3, correlativas: ["9", "10", "12", "15"] },
+        { cod: "20", nombre: "Investigación en Salud y Bioética",   anio: 3, correlativas: ["13", "14", "16"] },
+        { cod: "21", nombre: "Epidemiología",                       anio: 3, correlativas: ["13", "15", "16"] },
+        { cod: "22", nombre: "Planificación de la Salud",           anio: 3, correlativas: ["21"] },
+        { cod: "23", nombre: "Diagnóstico por Imágenes",            anio: 3, correlativas: ["10"] },
+        { cod: "24", nombre: "Clínica Médica I",                    anio: 4, correlativas: ["17", "18", "19", "23"] },
+        { cod: "25", nombre: "Promoción de la Salud",               anio: 4, correlativas: ["20", "21", "22"] },
+        { cod: "26", nombre: "Traumatología y Ortopedia",           anio: 4, correlativas: ["17", "18", "19", "23"] },
+        { cod: "27", nombre: "Medicina Legal y Deontología",        anio: 4, correlativas: ["17", "20", "21"] },
+        { cod: "28", nombre: "Infectología",                        anio: 4, correlativas: ["17", "18", "19", "21"] },
+        { cod: "29", nombre: "Neurología",                          anio: 4, correlativas: ["18", "19"] },
+        { cod: "30", nombre: "Salud Mental",                        anio: 4, correlativas: ["18", "19"] },
+        { cod: "31", nombre: "Clínica Médica II",                   anio: 5, correlativas: ["24", "28", "29", "30"] },
+        { cod: "32", nombre: "Cirugía",                             anio: 5, correlativas: ["24", "26", "27", "28"] },
+        { cod: "33", nombre: "Pediatría",                           anio: 5, correlativas: ["24", "26", "28"] },
+        { cod: "34", nombre: "Emergentología",                      anio: 5, correlativas: ["24", "26", "27", "29"] },
+        { cod: "35", nombre: "Ginecología",                         anio: 5, correlativas: ["24", "27"] },
+        { cod: "36", nombre: "Obstetricia",                         anio: 5, correlativas: ["30", "35"] },
+        { cod: "37", nombre: "Medicina General",                    anio: 5, correlativas: ["25", "28", "34"] },
+        { clave: "pfo-clinica-medica", nombre: "Clínica Médica (PFO)",                anio: 6, correlativas: [] },
+        { clave: "pfo-clinica-quirurgica", nombre: "Clínica Quirúrgica (PFO)",            anio: 6, correlativas: [] },
+        { clave: "pfo-clinica-pediatrica", nombre: "Clínica Pediátrica (PFO)",            anio: 6, correlativas: [] },
+        { clave: "pfo-clinica-gineco-obstetrica", nombre: "Clínica Gineco-Obstétrica (PFO)",     anio: 6, correlativas: [] },
+        { clave: "pfo-medicina-general-y-rural", nombre: "Medicina General y Rural (PFO)",      anio: 6, correlativas: [] }
+      ]
+    },
+    {
+      id: "medpre2025",
+      carrera: "Medicina (pre-2025)",
+      resoluciones: [
+        "Resolución CDFCN Nº 213/13, 458/13 y 615/14",
+        "Resolución C.S. Nº 076/13, 014/14 y 096/14",
+        "Resolución 2016-2118-E-APN-ME"
+      ],
+      materias: [
+        { cod: "1",  nombre: "Matemática",                               anio: 1, correlativas: [] },
+        { cod: "2",  nombre: "Biofísica",                                anio: 1, correlativas: [] },
+        { cod: "3",  nombre: "Comprensión de Textos",                    anio: 1, correlativas: [] },
+        { cod: "4",  nombre: "Biología",                                 anio: 1, correlativas: [] },
+        { cod: "5",  nombre: "Investigación en Salud y Bioética",        anio: 1, correlativas: ["3"] },
+        { cod: "6",  nombre: "Bioquímica General",                       anio: 1, correlativas: ["4"] },
+        { cod: "7",  nombre: "Anatomía Funcional",                       anio: 1, correlativas: ["4"] },
+        { cod: "8",  nombre: "Histología y Embriología",                 anio: 1, correlativas: ["4"] },
+        { cod: "9",  nombre: "Fisiología",                               anio: 2, correlativas: ["2", "7", "8"] },
+        { cod: "10", nombre: "Bioquímica Metabólica",                    anio: 2, correlativas: ["1", "6"] },
+        { cod: "11", nombre: "Ciencias Sociales y Medicina",             anio: 2, correlativas: ["5"] },
+        { cod: "12", nombre: "Microbiología",                            anio: 2, correlativas: ["6"] },
+        { cod: "13", nombre: "Inmunología",                              anio: 2, correlativas: ["8", "10"] },
+        { cod: "14", nombre: "Genética",                                 anio: 2, correlativas: ["10"] },
+        { cod: "15", nombre: "Salud de la Comunidad",                    anio: 2, correlativas: ["11"] },
+        { cod: "16", nombre: "Neurociencia",                             anio: 2, correlativas: ["9"] },
+        { cod: "17", nombre: "Patología",                                anio: 3, correlativas: ["9", "13", "14"] },
+        { cod: "18", nombre: "Semiología",                               anio: 3, correlativas: ["9", "12", "16"] },
+        { cod: "19", nombre: "Farmacología Básica, General y Farmacodinamia", anio: 3, correlativas: ["9", "12", "13"] },
+        { cod: "20", nombre: "Epidemiología",                            anio: 3, correlativas: ["15"] },
+        { cod: "21", nombre: "Planificación de la Salud",                anio: 3, correlativas: ["20"] },
+        { cod: "22", nombre: "Taller de Integración Vertical",           anio: 3, correlativas: ["17", "18", "19", "20"],
+          requisito: "El Taller de integración vertical se cursa de manera intensiva una vez finalizado el dictado de las asignaturas cuatrimestrales y anuales correlativas del mismo año." },
+        { cod: "23", nombre: "Clínica Médica I",                         anio: 4, correlativas: ["22"] },
+        { cod: "24", nombre: "Pediatría I",                              anio: 4, correlativas: ["22"] },
+        { cod: "25", nombre: "Cirugía I",                                anio: 4, correlativas: ["22"] },
+        { cod: "26", nombre: "Toxicología",                              anio: 4, correlativas: ["22"] },
+        { cod: "27", nombre: "Promoción de la Salud",                    anio: 4, correlativas: ["21"] },
+        { cod: "28", nombre: "Obstetricia",                              anio: 4, correlativas: ["22"] },
+        { cod: "29", nombre: "Emergentología",                           anio: 4, correlativas: ["22"] },
+        { cod: "30", nombre: "Salud Pública I",                          anio: 4, correlativas: ["27"] },
+        { cod: "31", nombre: "Clínica Médica II",                        anio: 5, correlativas: ["23"] },
+        { cod: "32", nombre: "Cirugía II",                               anio: 5, correlativas: ["25"] },
+        { cod: "33", nombre: "Pediatría II",                             anio: 5, correlativas: ["24"] },
+        { cod: "34", nombre: "Ginecología",                              anio: 5, correlativas: ["23", "28"] },
+        { cod: "35", nombre: "Deontología",                              anio: 5, correlativas: ["30"] },
+        { cod: "36", nombre: "Salud Pública II",                         anio: 5, correlativas: ["30"] },
+        { clave: "pfo", nombre: "Práctica Final Obligatoria (PFO)",         grupo: "Práctica final", correlativas: [],
+          requisito: "Es requisito de ingreso a la PFO, ser alumno regular, haber rendido y aprobado la totalidad de las materias de la carrera de medicina de 1º a 5º año, haber cumplido las 200 horas de actividades electivas, 140 horas de actividades de investigación y extensión y 256 horas de trabajo de campo." }
       ]
     },
     {
