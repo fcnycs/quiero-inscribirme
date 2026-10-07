@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1a8f5a">
 <title>Quiero Inscribirme</title>
 <meta name="description" content="Elegí tu carrera y la materia para ver qué correlativas necesitás, y si te piden el concepto o el final.">
 <meta property="og:type" content="website">
@@ -15,16 +16,46 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
 
+<script>
+  /* Fondo de la página: un color suave distinto en cada carga, siguiendo el orden del arcoíris.
+     Para cambiar los colores, editá esta lista. */
+  (function () {
+    var COLORES = [
+      "#ffe1e8",  // rosa
+      "#ffe7d3",  // durazno
+      "#fff4c2",  // amarillo
+      "#ddf3de",  // verde
+      "#d9ecfb",  // celeste
+      "#e9e1fa"   // lila
+    ];
+    // Recuerda el último color usado para no repetirlo: primero en el navegador y, si no se puede, en la pestaña.
+    var anterior = NaN;
+    try { anterior = parseInt(localStorage.getItem("qi-fondo"), 10); } catch (e) {}
+    if (isNaN(anterior)) {
+      try { anterior = parseInt(history.state && history.state.qiFondo, 10); } catch (e) {}
+    }
+    var i = isNaN(anterior) ? Math.floor(Math.random() * COLORES.length) : (anterior + 1) % COLORES.length;
+    try { localStorage.setItem("qi-fondo", String(i)); } catch (e) {}
+    try { history.replaceState(Object.assign({}, history.state, { qiFondo: i }), ""); } catch (e) {}
+    document.documentElement.style.setProperty("--papel", COLORES[i]);
+  })();
+</script>
+
 <style>
   :root {
-    --papel: #ffffff;
+    --papel: #ffe1e8;        /* fondo de la página: lo cambia el script de arriba en cada carga */
+    --blanco: #ffffff;
     --tinta: #1a2466;        /* azul birome: todo el texto */
-    --tinta-suave: #56608f;  /* texto secundario */
-    --linea: #d5daec;
+    --tinta-suave: #4f5885;  /* texto secundario */
+    --verde-fcncs: #1a8f5a;  /* el verde del logo de la facultad: es el mismo valor, así el logo no deja marca */
     --amarillo: #ffe84a;     /* resaltador: concepto aprobado */
-    --verde: #86e8cf;        /* resaltador: final o promoción */
-    --rojo: #b3202c;         /* birome roja: lo que falta completar o confirmar */
+    --agua: #86e8cf;         /* resaltador: final o promoción */
+    --rojo: #b3202c;         /* lo que falta completar o confirmar */
     --fuente: "Archivo", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    --flecha: 1.8rem;        /* tamaño de la flecha guía */
+  }
+  @supports (width: clamp(1px, 2px, 3px)) {
+    :root { --flecha: clamp(1.75rem, 1.2rem + 2.4vw, 2.6rem); }
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -32,6 +63,9 @@
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
   body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     margin: 0;
     background: var(--papel);
     color: var(--tinta);
@@ -39,6 +73,7 @@
     font-size: 1.0625rem;
     line-height: 1.5;
   }
+  main { flex: 1 0 auto; }
 
   .sr {
     position: absolute;
@@ -49,31 +84,61 @@
     white-space: nowrap;
   }
 
+  /* Columna central. Cada franja de la página (portada, pregunta, respuesta, pie) tiene una adentro. */
   .hoja {
     max-width: 50rem;
     margin: 0 auto;
-    padding: 1.5rem 1.25rem 3rem;
-    padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 3rem) 3rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  @supports (width: clamp(1px, 2px, 3px)) {
+    .hoja { padding-left: clamp(1.25rem, 5vw, 3rem); padding-right: clamp(1.25rem, 5vw, 3rem); }
   }
 
-  /* ---------- Membrete ---------- */
+  /* ---------- Portada ---------- */
 
-  .membrete {
+  .portada {
+    background: var(--verde-fcncs);
+    border-bottom: .3rem solid #000;
+    color: #fff;
+  }
+  .portada .hoja {
     display: flex;
     align-items: center;
-    font-size: .875rem;
-    line-height: 1.3;
-    color: var(--tinta-suave);
+    justify-content: space-between;
+    padding-top: .7rem;
+    padding-bottom: .7rem;
   }
-  .membrete img { flex: none; width: 2.25rem; height: auto; margin-right: .75rem; }
-  .membrete p { margin: 0; text-wrap: balance; }
-  .membrete strong { display: block; color: var(--tinta); font-weight: 700; }
+  .uni {
+    display: flex;
+    flex: none;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    line-height: 1;
+  }
+  .uni img { width: 2.25rem; height: auto; margin-right: .6rem; }
+  .facu {
+    flex: 0 1 17rem;
+    min-width: 0;
+    margin-left: 1rem;
+    font-size: 1.1875rem;   /* solo se ve si el logo no carga */
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: right;
+  }
+  .facu img { display: block; width: 100%; height: auto; }
 
   /* ---------- La frase ---------- */
 
+  .pregunta .hoja { padding-top: 1.75rem; padding-bottom: 2.5rem; }
+  @supports (width: clamp(1px, 2px, 3px)) {
+    .pregunta .hoja { padding-top: clamp(1.5rem, 5vw, 3rem); padding-bottom: clamp(2.25rem, 6vw, 3.5rem); }
+  }
+
   h1 {
-    margin: 2.25rem 0 0;
-    margin-top: clamp(2rem, 7vw, 3.75rem);
+    margin: 0;
     font-size: 3rem;
     font-size: clamp(2.75rem, 1.5rem + 7vw, 5.25rem);
     font-weight: 800;
@@ -83,42 +148,50 @@
   }
 
   .frase {
-    margin: .55em 0 0;
-    font-size: 1.75rem;
-    font-size: clamp(1.625rem, 1rem + 3.2vw, 2.75rem);
+    margin: .5em 0 0;
+    font-size: 1.625rem;
+    font-size: clamp(1.5rem, .95rem + 2.9vw, 2.5rem);
     font-weight: 450;
     font-stretch: 88%;
-    line-height: 1.38;
+    line-height: 1.5;
   }
-  .frase .pregunta { display: block; }
+  .frase .cierre { display: block; }
+  .frase .junto { white-space: nowrap; }   /* el recuadro de la materia y su punto final no se separan */
 
-  /* Cada espacio en blanco: se ve el texto subrayado y, encima, un <select> invisible
+  /* Cada recuadro: se ve el texto elegido y, encima, un <select> invisible
      que abre la lista del navegador (en el celular, el selector nativo). */
   .blanco {
     position: relative;
     display: inline-block;
     max-width: 100%;
-    padding: .08em 0;
-    border-radius: .15em;
+    margin: .5em 0 .2em;
+    padding: .04em .4em .08em;
+    border: .08em solid var(--tinta);
+    border-radius: .3em;
+    background: var(--blanco);
+    box-shadow: 0 .1em 0 var(--tinta);
     font-weight: 750;
+    line-height: 1.22;
+    white-space: normal;
     vertical-align: baseline;
   }
-  .blanco .tx {
-    text-decoration: underline;
-    text-decoration-thickness: .07em;
-    text-underline-offset: .17em;
-  }
+  .junto .blanco { max-width: calc(100% - .35em); }
   .blanco .nb { white-space: nowrap; }
   .blanco .chev {
     width: .58em;
     height: .4em;
-    margin-left: .2em;
+    margin-left: .22em;
     vertical-align: .12em;
   }
-  .blanco .punto { font-weight: 450; color: var(--tinta); }
   .blanco.vacio { font-weight: 450; color: var(--tinta-suave); }
-  .blanco.falta .tx { text-decoration-color: var(--rojo); text-decoration-style: wavy; }
-  .blanco.inactivo { opacity: .55; }
+  .blanco.inactivo { opacity: .55; box-shadow: none; }
+  .blanco.sigue { border-color: var(--verde-fcncs); box-shadow: 0 .1em 0 var(--verde-fcncs); }
+  .blanco.falta { border-color: var(--rojo); box-shadow: 0 .1em 0 var(--rojo); }
+  .blanco.listo { animation: listo .3s ease-out; }
+  @media (hover: hover) {
+    .blanco:not(.inactivo):hover { background: #eef1ff; }
+  }
+  .blanco:not(.inactivo):active { transform: translateY(.06em); box-shadow: 0 .04em 0 var(--tinta); }
 
   .blanco select {
     position: absolute;
@@ -133,42 +206,67 @@
   }
   .blanco select:disabled { cursor: not-allowed; }
 
-  .blanco:focus-within { outline: 2px solid var(--tinta); outline-offset: .1em; }
+  .blanco:focus-within { outline: 3px solid var(--tinta); outline-offset: 3px; }
   @supports selector(:has(a)) {
     .blanco:focus-within { outline: none; }
-    .blanco:has(select:focus-visible) { outline: 2px solid var(--tinta); outline-offset: .1em; }
+    .blanco:has(select:focus-visible) { outline: 3px solid var(--tinta); outline-offset: 3px; }
   }
 
   .consultar {
+    position: relative;
     margin-top: 1.75rem;
-    min-height: 3.25rem;
-    padding: .8em 1.9em;
+    min-height: 3.4rem;
+    padding: .85em 2em;
     border: 0;
-    border-radius: .5rem;
+    border-radius: .55rem;
     background: var(--tinta);
+    box-shadow: 0 .22rem 0 #0a0f33;
     color: #fff;
     font: 700 1.1875rem/1 var(--fuente);
     cursor: pointer;
   }
-  .consultar:hover { background: #111a4d; }
-  .consultar:active { transform: translateY(1px); }
-  .consultar:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+  @media (hover: hover) {
+    .consultar:hover { background: #111a4d; }
+  }
+  .consultar:active { transform: translateY(.12rem); box-shadow: 0 .1rem 0 #0a0f33; }
+  .consultar:focus-visible { outline: 3px solid var(--tinta); outline-offset: 4px; }
+
+  /* Flecha guía: se apoya en la esquina del próximo paso (el recuadro que falta o el botón). */
+  .sigue::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--flecha) * -.62);
+    left: calc(var(--flecha) * -.62);
+    z-index: 2;
+    width: var(--flecha);
+    height: var(--flecha);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 5l12.5 12.5M17.5 8v9.5H8' stroke='%23fff' stroke-width='7.5'/%3E%3Cpath d='M5 5l12.5 12.5M17.5 8v9.5H8' stroke='%231a8f5a' stroke-width='4.4'/%3E%3C/svg%3E") center / contain no-repeat;
+    pointer-events: none;
+    animation: senalar 1.1s ease-in-out infinite;
+  }
+  @keyframes senalar {
+    0%, 100% { transform: translate(-18%, -18%); }
+    50% { transform: translate(6%, 6%); }
+  }
+  @keyframes listo {
+    40% { transform: scale(1.035); }
+  }
 
   .error {
-    margin: .9rem 0 0;
+    margin: 1rem 0 0;
     color: var(--rojo);
     font-weight: 600;
   }
   .error:empty { display: none; }
 
-  /* ---------- La respuesta ---------- */
+  /* ---------- La respuesta (sobre blanco, para que los resaltadores se lean igual con cualquier fondo) ---------- */
 
   .respuesta {
-    margin-top: 2.75rem;
-    padding-top: 2rem;
+    background: var(--blanco);
     border-top: 2px solid var(--tinta);
-    scroll-margin-top: 1rem;
+    border-bottom: 2px solid var(--tinta);
   }
+  .respuesta .hoja { padding-top: 2rem; padding-bottom: 2.5rem; }
 
   .titulo {
     margin: 0;
@@ -245,7 +343,7 @@
     animation: trazo .45s cubic-bezier(.2, .7, .2, 1) backwards;
   }
   .concepto { --res: var(--amarillo); --alto: 52%; --pos: 80%; --lleno: 50%; }
-  .final { --res: var(--verde); --alto: 88%; --pos: 55%; --lleno: 100%; }
+  .final { --res: var(--agua); --alto: 88%; --pos: 55%; --lleno: 100%; }
   @keyframes trazo { from { background-size: 0% var(--alto); } }
 
   .sub {
@@ -318,13 +416,8 @@
     color: var(--tinta-suave);
   }
 
-  .pie {
-    margin-top: 3.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--linea);
-    font-size: .8125rem;
-    color: var(--tinta-suave);
-  }
+  .pie { font-size: .8125rem; color: var(--tinta-suave); }
+  .pie .hoja { padding-top: 1.1rem; padding-bottom: 1.75rem; }
   .pie p { margin: 0; max-width: 40em; }
 
   @media (max-width: 30rem) {
@@ -332,49 +425,61 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .res { animation: none; }
-    .consultar:active { transform: none; }
+    .res, .blanco.listo { animation: none; }
+    .sigue::before { animation: none; }
+    .blanco:not(.inactivo):active, .consultar:active { transform: none; }
   }
 </style>
 </head>
 <body>
-<div class="hoja">
 
-  <header class="membrete">
-    <img src="https://fcnycs.github.io/mesas-examen/logo_s.png" alt="Universidad Nacional de la Patagonia San Juan Bosco" width="36" height="45" onerror="this.remove()">
-    <p><strong>UNPSJB</strong>Facultad de Ciencias Naturales y Ciencias de la Salud</p>
-  </header>
+<header class="portada">
+  <div class="hoja">
+    <div class="uni">
+      <img src="https://fcnycs.github.io/mesas-examen/logo_s.png" alt="Universidad Nacional de la Patagonia San Juan Bosco" width="36" height="45" onerror="this.remove()">
+      <span>UNPSJB</span>
+    </div>
+    <!-- El logo va en la misma carpeta que esta página. Si no está, queda el nombre en texto. -->
+    <div class="facu"><img src="logo-fcncs.png" alt="FCNCS, Facultad de Ciencias Naturales y Ciencias de la Salud" width="913" height="264" onerror="this.parentNode.textContent='Facultad de Ciencias Naturales y Ciencias de la Salud'"></div>
+  </div>
+</header>
 
-  <main>
-    <h1>Quiero Inscribirme</h1>
+<main>
+  <div class="pregunta">
+    <div class="hoja">
+      <h1>Quiero Inscribirme</h1>
 
-    <form id="consulta" autocomplete="off" novalidate>
-      <p class="frase">
-        Soy de la carrera
-        <span class="blanco" id="blanco-carrera"><span class="valor" aria-hidden="true"></span><select id="carrera" aria-label="Carrera"></select></span>
-        y&nbsp;deseo inscribirme a
-        <span class="blanco" id="blanco-modo"><span class="valor" aria-hidden="true"></span><select id="modo" aria-label="Inscribirme a">
-          <option value="cursar">cursar</option>
-          <option value="final">rendir final de</option>
-        </select></span>
-        <span class="blanco" id="blanco-materia" data-punto="1"><span class="valor" aria-hidden="true"></span><select id="materia" aria-label="Materia"></select></span>
-        <span class="pregunta">¿Qué correlativas necesito?</span>
-      </p>
-      <button class="consultar" type="submit">Consultar</button>
-      <p class="error" id="error" role="alert"></p>
-      <p class="sr" id="resumen" role="status"></p>
-    </form>
+      <form id="consulta" autocomplete="off" novalidate>
+        <p class="frase">
+          Soy de la carrera
+          <span class="blanco" id="blanco-carrera"><span class="valor" aria-hidden="true"></span><select id="carrera" aria-label="Carrera"></select></span>
+          y&nbsp;deseo inscribirme a
+          <span class="blanco" id="blanco-modo"><span class="valor" aria-hidden="true"></span><select id="modo" aria-label="Inscribirme a">
+            <option value="cursar">cursar</option>
+            <option value="final">rendir final de</option>
+          </select></span>
+          <span class="junto"><span class="blanco" id="blanco-materia"><span class="valor" aria-hidden="true"></span><select id="materia" aria-label="Materia"></select></span>.</span>
+          <span class="cierre">¿Qué correlativas necesito?</span>
+        </p>
+        <button class="consultar" type="submit">Consultar</button>
+        <p class="error" id="error" role="alert"></p>
+        <p class="sr" id="resumen" role="status"></p>
+      </form>
 
-    <section class="respuesta" id="respuesta" aria-label="Respuesta" hidden></section>
+      <noscript><p class="error">Esta página necesita JavaScript para consultar las correlativas.</p></noscript>
+    </div>
+  </div>
 
-    <noscript><p class="error">Esta página necesita JavaScript para consultar las correlativas.</p></noscript>
-  </main>
+  <section class="respuesta" id="respuesta" aria-label="Respuesta" hidden>
+    <div class="hoja" id="detalle"></div>
+  </section>
+</main>
 
-  <footer class="pie">
+<footer class="pie">
+  <div class="hoja">
     <p>Esta página informa las correlativas según los planes de estudio cargados. No hace la inscripción ni reemplaza al plan de estudios oficial.</p>
-  </footer>
-
-</div>
+  </div>
+</footer>
 
 <script>
 (() => {
@@ -472,9 +577,11 @@
   const selCarrera = $("carrera");
   const selModo = $("modo");
   const selMateria = $("materia");
-  const respuesta = $("respuesta");
+  const boton = document.querySelector(".consultar");
+  const respuesta = $("respuesta");   // la franja blanca
+  const detalle = $("detalle");       // lo que va adentro
   const error = $("error");
-  const resumen = $("resumen");   // aviso corto para lectores de pantalla
+  const resumen = $("resumen");       // aviso corto para lectores de pantalla
   const ANIOS = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo"];
   const TEXTO = { concepto: "concepto aprobado", final: "final o promoción" };
   const SVG = "http://www.w3.org/2000/svg";
@@ -488,7 +595,7 @@
     return n;
   }
 
-  function flecha() {
+  function flechita() {
     const s = document.createElementNS(SVG, "svg");
     s.setAttribute("class", "chev");
     s.setAttribute("viewBox", "0 0 12 8");
@@ -504,16 +611,15 @@
     return s;
   }
 
-  // Escribe el valor elegido en el espacio en blanco. La última palabra queda pegada a la flecha.
+  // Escribe el valor elegido en el recuadro. La última palabra queda pegada a la flechita.
   function escribir(select, texto, vacio) {
     const blanco = select.parentElement;
     const valor = blanco.querySelector(".valor");
     const corte = texto.lastIndexOf(" ");
     vaciar(valor);
-    if (corte >= 0) valor.append(el("span", "tx", texto.slice(0, corte + 1)));
-    const fin = el("span", "nb");
-    fin.append(el("span", "tx", texto.slice(corte + 1)), flecha());
-    if (blanco.dataset.punto) fin.append(el("span", "punto", "."));
+    if (corte >= 0) valor.append(texto.slice(0, corte + 1));
+    const fin = el("span", "nb", texto.slice(corte + 1));
+    fin.append(flechita());
     valor.append(fin);
     blanco.classList.toggle("vacio", vacio);
     blanco.classList.toggle("inactivo", select.disabled);
@@ -544,17 +650,30 @@
     }
   }
 
+  // La flecha guía señala lo próximo que falta: la carrera, la materia o, al final, el botón.
+  function guiar() {
+    const plan = planElegido();
+    let proximo = null;
+    if (!plan) proximo = selCarrera.parentElement;
+    else if (!plan.porCod.has(selMateria.value)) proximo = selMateria.parentElement;
+    else if (respuesta.hidden) proximo = boton;
+    for (const paso of [selCarrera.parentElement, selModo.parentElement, selMateria.parentElement, boton]) {
+      paso.classList.toggle("sigue", paso === proximo);
+    }
+  }
+
   function sincronizar() {
     const plan = planElegido();
     escribir(selCarrera, plan ? plan.titulo : "elegí tu carrera", !plan);
     escribir(selModo, selModo.selectedOptions[0].textContent, false);
     const m = plan && plan.porCod.get(selMateria.value);
     escribir(selMateria, m ? m.nombre : "elegí la materia", !m);
+    guiar();
   }
 
   function limpiar() {
     respuesta.hidden = true;
-    vaciar(respuesta);
+    vaciar(detalle);
     error.textContent = "";
     resumen.textContent = "";
     for (const s of [selCarrera, selMateria]) {
@@ -570,6 +689,15 @@
     select.setAttribute("aria-describedby", "error");
     select.parentElement.classList.add("falta");
     select.focus();
+  }
+
+  // Pequeño rebote del recuadro cuando se elige algo.
+  function confirmar(select) {
+    const blanco = select.parentElement;
+    blanco.classList.remove("listo");
+    if (!select.value) return;
+    void blanco.offsetWidth;
+    blanco.classList.add("listo");
   }
 
   const cuantas = (n) => (n === 1 ? "1 materia" : `${n} materias`);
@@ -694,10 +822,11 @@
 
     partes.push(el("p", "fuente", `Según el plan de ${plan.titulo}. ${plan.resoluciones.map((x) => x + ".").join(" ")}`));
 
-    vaciar(respuesta);
-    respuesta.append(...partes);
+    vaciar(detalle);
+    detalle.append(...partes);
     respuesta.hidden = false;
     resumen.textContent = dicho;
+    guiar();
 
     const caja = respuesta.getBoundingClientRect();
     if (caja.top < 0 || caja.top > window.innerHeight * 0.55) {
@@ -716,9 +845,9 @@
     mostrar(plan, selMateria.value, selModo.value);
   }
 
-  selCarrera.addEventListener("change", () => { llenarMaterias(); limpiar(); sincronizar(); });
-  selModo.addEventListener("change", () => { limpiar(); sincronizar(); });
-  selMateria.addEventListener("change", () => { limpiar(); sincronizar(); });
+  selCarrera.addEventListener("change", () => { llenarMaterias(); limpiar(); sincronizar(); confirmar(selCarrera); });
+  selModo.addEventListener("change", () => { limpiar(); sincronizar(); confirmar(selModo); });
+  selMateria.addEventListener("change", () => { limpiar(); sincronizar(); confirmar(selMateria); });
   $("consulta").addEventListener("submit", (e) => { e.preventDefault(); consultar(); });
   window.addEventListener("pageshow", sincronizar);
 
