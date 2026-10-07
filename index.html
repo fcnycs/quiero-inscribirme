@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Quiero Inscribirme</title>
+<meta name="description" content="Elegí tu carrera y la materia para ver qué correlativas necesitás, y si te piden el concepto o el final.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quiero Inscribirme">
+<meta property="og:description" content="Elegí tu carrera y la materia para ver qué correlativas necesitás, y si te piden el concepto o el final.">
+
+<!-- Tipografía: Archivo, de Omnibus-Type (Buenos Aires). Si no carga, la página usa la del sistema. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --papel: #ffffff;
+    --tinta: #1a2466;        /* azul birome: todo el texto */
+    --tinta-suave: #56608f;  /* texto secundario */
+    --linea: #d5daec;
+    --amarillo: #ffe84a;     /* resaltador: concepto aprobado */
+    --verde: #86e8cf;        /* resaltador: final o promoción */
+    --rojo: #b3202c;         /* birome roja: lo que falta completar o confirmar */
+    --fuente: "Archivo", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .hoja {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 3rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 3rem) 3rem;
+  }
+
+  /* ---------- Membrete ---------- */
+
+  .membrete {
+    display: flex;
+    align-items: center;
+    font-size: .875rem;
+    line-height: 1.3;
+    color: var(--tinta-suave);
+  }
+  .membrete img { flex: none; width: 2.25rem; height: auto; margin-right: .75rem; }
+  .membrete p { margin: 0; text-wrap: balance; }
+  .membrete strong { display: block; color: var(--tinta); font-weight: 700; }
+
+  /* ---------- La frase ---------- */
+
+  h1 {
+    margin: 2.25rem 0 0;
+    margin-top: clamp(2rem, 7vw, 3.75rem);
+    font-size: 3rem;
+    font-size: clamp(2.75rem, 1.5rem + 7vw, 5.25rem);
+    font-weight: 800;
+    font-stretch: 75%;
+    line-height: .95;
+    letter-spacing: -.015em;
+  }
+
+  .frase {
+    margin: .55em 0 0;
+    font-size: 1.75rem;
+    font-size: clamp(1.625rem, 1rem + 3.2vw, 2.75rem);
+    font-weight: 450;
+    font-stretch: 88%;
+    line-height: 1.38;
+  }
+  .frase .pregunta { display: block; }
+
+  /* Cada espacio en blanco: se ve el texto subrayado y, encima, un <select> invisible
+     que abre la lista del navegador (en el celular, el selector nativo). */
+  .blanco {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    padding: .08em 0;
+    border-radius: .15em;
+    font-weight: 750;
+    vertical-align: baseline;
+  }
+  .blanco .tx {
+    text-decoration: underline;
+    text-decoration-thickness: .07em;
+    text-underline-offset: .17em;
+  }
+  .blanco .nb { white-space: nowrap; }
+  .blanco .chev {
+    width: .58em;
+    height: .4em;
+    margin-left: .2em;
+    vertical-align: .12em;
+  }
+  .blanco .punto { font-weight: 450; color: var(--tinta); }
+  .blanco.vacio { font-weight: 450; color: var(--tinta-suave); }
+  .blanco.falta .tx { text-decoration-color: var(--rojo); text-decoration-style: wavy; }
+  .blanco.inactivo { opacity: .55; }
+
+  .blanco select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    font: 400 1rem/1.3 var(--fuente);
+  }
+  .blanco select:disabled { cursor: not-allowed; }
+
+  .blanco:focus-within { outline: 2px solid var(--tinta); outline-offset: .1em; }
+  @supports selector(:has(a)) {
+    .blanco:focus-within { outline: none; }
+    .blanco:has(select:focus-visible) { outline: 2px solid var(--tinta); outline-offset: .1em; }
+  }
+
+  .consultar {
+    margin-top: 1.75rem;
+    min-height: 3.25rem;
+    padding: .8em 1.9em;
+    border: 0;
+    border-radius: .5rem;
+    background: var(--tinta);
+    color: #fff;
+    font: 700 1.1875rem/1 var(--fuente);
+    cursor: pointer;
+  }
+  .consultar:hover { background: #111a4d; }
+  .consultar:active { transform: translateY(1px); }
+  .consultar:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+
+  .error {
+    margin: .9rem 0 0;
+    color: var(--rojo);
+    font-weight: 600;
+  }
+  .error:empty { display: none; }
+
+  /* ---------- La respuesta ---------- */
+
+  .respuesta {
+    margin-top: 2.75rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--tinta);
+    scroll-margin-top: 1rem;
+  }
+
+  .titulo {
+    margin: 0;
+    font-size: 1.875rem;
+    font-size: clamp(1.75rem, 1.1rem + 3vw, 2.75rem);
+    font-weight: 800;
+    font-stretch: 80%;
+    line-height: 1.05;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+  }
+  .titulo .entrada {
+    display: block;
+    margin-bottom: .25rem;
+    font-size: 1.1875rem;
+    font-weight: 450;
+    font-stretch: 100%;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  .cod { font-variant-numeric: tabular-nums; }
+  .titulo .cod { font-weight: 450; }
+
+  .conector {
+    margin: 1.5rem 0 .4rem;
+    font-size: 1.1875rem;
+    font-weight: 450;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+  .titulo + .conector { margin-top: .5rem; }
+
+  .nada {
+    margin: .5rem 0 0;
+    font-size: 1.3125rem;
+    font-weight: 450;
+    line-height: 1.4;
+  }
+
+  .materias { list-style: none; margin: 0; padding: 0; }
+  .materias li {
+    display: grid;
+    grid-template-columns: 2.05em 1fr;
+    align-items: baseline;
+    padding: .2em 0;
+    font-size: 1.3125rem;
+    font-size: clamp(1.25rem, 1.05rem + 1vw, 1.5rem);
+    font-weight: 700;
+    font-stretch: 92%;
+    line-height: 1.32;
+  }
+  .materias .cod { font-size: .8em; font-weight: 450; color: var(--tinta-suave); }
+  .materias .aclaracion {
+    grid-column: 2;
+    margin-top: .15rem;
+    font-size: .875rem;
+    font-weight: 400;
+    font-stretch: 100%;
+    line-height: 1.4;
+    color: var(--tinta-suave);
+  }
+
+  /* Resaltador. Trazo bajo = concepto (la materia a medias). Trazo completo = final o promoción. */
+  .res {
+    padding: 0 .2em;
+    margin: 0 -.2em;
+    background-image: linear-gradient(var(--res), var(--res));
+    background-repeat: no-repeat;
+    background-size: 100% var(--alto);
+    background-position: 0 var(--pos);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    animation: trazo .45s cubic-bezier(.2, .7, .2, 1) backwards;
+  }
+  .concepto { --res: var(--amarillo); --alto: 52%; --pos: 80%; --lleno: 50%; }
+  .final { --res: var(--verde); --alto: 88%; --pos: 55%; --lleno: 100%; }
+  @keyframes trazo { from { background-size: 0% var(--alto); } }
+
+  .sub {
+    margin: 2.75rem 0 .25rem;
+    font-size: 1.0625rem;
+    font-weight: 750;
+  }
+  .regla { margin: 0; max-width: 36em; font-size: .9375rem; color: var(--tinta-suave); }
+
+  .leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    margin: .8rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: .9375rem;
+  }
+  .leyenda li { margin: 0 1.25rem .3rem 0; }
+
+  /* Cuadradito del hilo: medio lleno = concepto, lleno = final o promoción. */
+  .marca {
+    display: inline-block;
+    width: .78em;
+    height: .78em;
+    margin-right: .4em;
+    border: 1.5px solid var(--tinta);
+    border-radius: 2px;
+    background: linear-gradient(to top, var(--res) var(--lleno), transparent var(--lleno));
+    vertical-align: -.04em;
+  }
+
+  .hilo { margin-top: 1rem; line-height: 1.35; }
+  .hilo .raiz { margin: 0; font-weight: 750; }
+  .hilo ul { list-style: none; margin: 0; padding: 0; }
+  .hilo > ul { margin-left: .3rem; }
+  .hilo li { position: relative; padding-left: 1.2rem; }
+  .hilo li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-left: 1.5px solid var(--tinta);
+  }
+  .hilo li::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.02em;
+    width: .85rem;
+    border-top: 1.5px solid var(--tinta);
+  }
+  .hilo li:last-child::before { bottom: auto; height: calc(1.02em + 1.5px); }
+  .hilo .fila { display: flex; align-items: baseline; padding: .32em 0; }
+  .hilo .marca, .hilo .fila .cod { flex: none; }
+  .hilo .cod { margin-right: .4em; color: var(--tinta-suave); }
+  .hilo .repetida { display: block; font-size: .875rem; color: var(--tinta-suave); }
+
+  .aviso {
+    margin: 2rem 0 0;
+    padding-left: .9rem;
+    border-left: 4px solid var(--rojo);
+    font-size: .9375rem;
+  }
+  .aviso strong { color: var(--rojo); }
+
+  .fuente {
+    margin: 2rem 0 0;
+    font-size: .8125rem;
+    color: var(--tinta-suave);
+  }
+
+  .pie {
+    margin-top: 3.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--linea);
+    font-size: .8125rem;
+    color: var(--tinta-suave);
+  }
+  .pie p { margin: 0; max-width: 40em; }
+
+  @media (max-width: 30rem) {
+    .consultar { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .res { animation: none; }
+    .consultar:active { transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <header class="membrete">
+    <img src="https://fcnycs.github.io/mesas-examen/logo_s.png" alt="Universidad Nacional de la Patagonia San Juan Bosco" width="36" height="45" onerror="this.remove()">
+    <p><strong>UNPSJB</strong>Facultad de Ciencias Naturales y Ciencias de la Salud</p>
+  </header>
+
+  <main>
+    <h1>Quiero Inscribirme</h1>
+
+    <form id="consulta" autocomplete="off" novalidate>
+      <p class="frase">
+        Soy de la carrera
+        <span class="blanco" id="blanco-carrera"><span class="valor" aria-hidden="true"></span><select id="carrera" aria-label="Carrera"></select></span>
+        y&nbsp;deseo inscribirme a
+        <span class="blanco" id="blanco-modo"><span class="valor" aria-hidden="true"></span><select id="modo" aria-label="Inscribirme a">
+          <option value="cursar">cursar</option>
+          <option value="final">rendir final de</option>
+        </select></span>
+        <span class="blanco" id="blanco-materia" data-punto="1"><span class="valor" aria-hidden="true"></span><select id="materia" aria-label="Materia"></select></span>
+        <span class="pregunta">¿Qué correlativas necesito?</span>
+      </p>
+      <button class="consultar" type="submit">Consultar</button>
+      <p class="error" id="error" role="alert"></p>
+      <p class="sr" id="resumen" role="status"></p>
+    </form>
+
+    <section class="respuesta" id="respuesta" aria-label="Respuesta" hidden></section>
+
+    <noscript><p class="error">Esta página necesita JavaScript para consultar las correlativas.</p></noscript>
+  </main>
+
+  <footer class="pie">
+    <p>Esta página informa las correlativas según los planes de estudio cargados. No hace la inscripción ni reemplaza al plan de estudios oficial.</p>
+  </footer>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* =====================================================================
+     PLANES DE ESTUDIO
+     Para sumar una carrera, agregá otro bloque { ... } a esta lista.
+       cod           código de la materia en el plan, entre comillas y con el cero adelante.
+       anio          año del plan al que pertenece (1, 2, 3...).
+       correlativas  los códigos de la columna "Correlatividades". Sin correlativas: [].
+       aviso         (opcional) texto que se muestra al consultar esa materia.
+     ===================================================================== */
+  const PLANES = [
+    {
+      id: "tuq",
+      titulo: "Técnico Universitario en Química",
+      resoluciones: [
+        "Resolución CAFCN Nº 163/96 - 304/96 - 303/07 - CDFCN Nº 314/09",
+        "Resolución C.S. Nº 203/96 - C.S. Nº 075/07 - C.S. Nº 033/10",
+        "Resolución Ministerio de Cultura y Educación Nº 1904/97"
+      ],
+      materias: [
+        { cod: "01", nombre: "Matemática I",                        anio: 1, correlativas: [] },
+        { cod: "02", nombre: "Química General",                     anio: 1, correlativas: [] },
+        { cod: "03", nombre: "Prácticas del Laboratorio Químico",   anio: 1, correlativas: [] },
+        { cod: "04", nombre: "Matemática II",                       anio: 1, correlativas: ["01"] },
+        { cod: "05", nombre: "Química Inorgánica",                  anio: 1, correlativas: ["02", "03"] },
+        { cod: "06", nombre: "Física I",                            anio: 1, correlativas: ["01"] },
+        { cod: "07", nombre: "Física II",                           anio: 2, correlativas: ["04", "06"] },
+        { cod: "08", nombre: "Química Orgánica I",                  anio: 2, correlativas: ["05"] },
+        { cod: "09", nombre: "Estadística",                         anio: 2, correlativas: ["01"] },
+        { cod: "10", nombre: "Química Orgánica II",                 anio: 2, correlativas: ["08"] },
+        { cod: "11", nombre: "Química Ambiental",                   anio: 2, correlativas: ["08"] },
+        { cod: "12", nombre: "Seminario de Manejo de Bibliografía", anio: 2, correlativas: ["02"] },
+        { cod: "13", nombre: "Química Biológica General",           anio: 3, correlativas: ["10"] },
+        { cod: "14", nombre: "Fisicoquímica",                       anio: 3, correlativas: ["05", "07"],
+          aviso: "En el plan escaneado, la segunda correlativa de Fisicoquímica está corregida a mano. Se cargó como 07 Física II." },
+        { cod: "15", nombre: "Química Analítica I",                 anio: 3, correlativas: ["09", "10"] },
+        { cod: "16", nombre: "Química Analítica II",                anio: 3, correlativas: ["15"] },
+        { cod: "17", nombre: "Inglés",                              anio: 3, correlativas: [] }
+      ]
+    }
+  ];
+  /* ======================= FIN DE LOS PLANES ======================= */
+
+
+  /* ---------- Reglas ----------
+     Para cursar: concepto aprobado de las correlativas de la materia, y final o promoción
+     de las precorrelativas (todo lo que piden esas correlativas, hasta el principio del hilo).
+     Para rendir final: final o promoción de todo el hilo.
+     Si una materia es correlativa directa y además la pide otra materia del hilo, va con final. */
+
+  for (const plan of PLANES) {
+    plan.porCod = new Map(plan.materias.map((m) => [m.cod, m]));
+    plan.orden = new Map(plan.materias.map((m, i) => [m.cod, i]));
+    for (const m of plan.materias) {
+      for (const c of m.correlativas) {
+        if (!plan.porCod.has(c)) console.warn(`${plan.titulo}: la ${m.cod} pide la ${c}, que no está en el plan.`);
+      }
+    }
+  }
+
+  const pedidas = (plan, cod) => plan.porCod.get(cod).correlativas.filter((c) => plan.porCod.has(c) && c !== cod);
+
+  function requisitos(plan, cod, modo) {
+    const directas = pedidas(plan, cod);
+    const via = new Map();      // materia del hilo -> quiénes la piden
+    const todas = [];           // todas las materias del hilo, sin la consultada
+    const cola = directas.map((c) => [c, cod]);
+    while (cola.length) {
+      const [c, pidePor] = cola.shift();
+      if (c === cod) continue;
+      if (via.has(c)) { via.get(c).add(pidePor); continue; }
+      via.set(c, new Set([pidePor]));
+      todas.push(c);
+      for (const d of pedidas(plan, c)) cola.push([d, c]);
+    }
+    // Es precorrelativa si la pide alguna materia del hilo que no sea la consultada.
+    const atras = new Set(todas.filter((c) => [...via.get(c)].some((v) => v !== cod)));
+    todas.sort((a, b) => plan.orden.get(a) - plan.orden.get(b));
+    return {
+      concepto: modo === "final" ? [] : todas.filter((c) => !atras.has(c)),
+      final: modo === "final" ? todas : todas.filter((c) => atras.has(c)),
+      solapadas: modo === "final" ? [] : directas.filter((c) => atras.has(c)),
+      atras,
+      via
+    };
+  }
+
+
+  /* ---------- Pantalla ---------- */
+
+  const $ = (id) => document.getElementById(id);
+  const selCarrera = $("carrera");
+  const selModo = $("modo");
+  const selMateria = $("materia");
+  const respuesta = $("respuesta");
+  const error = $("error");
+  const resumen = $("resumen");   // aviso corto para lectores de pantalla
+  const ANIOS = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto", "Sexto", "Séptimo"];
+  const TEXTO = { concepto: "concepto aprobado", final: "final o promoción" };
+  const SVG = "http://www.w3.org/2000/svg";
+
+  const vaciar = (nodo) => { nodo.textContent = ""; };
+
+  function el(etiqueta, clase, texto) {
+    const n = document.createElement(etiqueta);
+    if (clase) n.className = clase;
+    if (texto != null) n.textContent = texto;
+    return n;
+  }
+
+  function flecha() {
+    const s = document.createElementNS(SVG, "svg");
+    s.setAttribute("class", "chev");
+    s.setAttribute("viewBox", "0 0 12 8");
+    s.setAttribute("aria-hidden", "true");
+    const p = document.createElementNS(SVG, "path");
+    p.setAttribute("d", "M1.2 1.4 6 6.4l4.8-5");
+    p.setAttribute("fill", "none");
+    p.setAttribute("stroke", "currentColor");
+    p.setAttribute("stroke-width", "2");
+    p.setAttribute("stroke-linecap", "round");
+    p.setAttribute("stroke-linejoin", "round");
+    s.append(p);
+    return s;
+  }
+
+  // Escribe el valor elegido en el espacio en blanco. La última palabra queda pegada a la flecha.
+  function escribir(select, texto, vacio) {
+    const blanco = select.parentElement;
+    const valor = blanco.querySelector(".valor");
+    const corte = texto.lastIndexOf(" ");
+    vaciar(valor);
+    if (corte >= 0) valor.append(el("span", "tx", texto.slice(0, corte + 1)));
+    const fin = el("span", "nb");
+    fin.append(el("span", "tx", texto.slice(corte + 1)), flecha());
+    if (blanco.dataset.punto) fin.append(el("span", "punto", "."));
+    valor.append(fin);
+    blanco.classList.toggle("vacio", vacio);
+    blanco.classList.toggle("inactivo", select.disabled);
+  }
+
+  const planElegido = () => PLANES.find((p) => p.id === selCarrera.value);
+
+  function llenarCarreras() {
+    vaciar(selCarrera);
+    if (PLANES.length !== 1) selCarrera.append(new Option("elegí tu carrera", ""));
+    for (const p of PLANES) selCarrera.append(new Option(p.titulo, p.id));
+  }
+
+  function llenarMaterias() {
+    const plan = planElegido();
+    vaciar(selMateria);
+    selMateria.append(new Option("elegí la materia", ""));
+    selMateria.disabled = !plan;
+    if (!plan) return;
+    const anios = [...new Set(plan.materias.map((m) => m.anio))].sort((a, b) => a - b);
+    for (const anio of anios) {
+      const grupo = document.createElement("optgroup");
+      grupo.label = `${ANIOS[anio - 1] || anio + "º"} año`;
+      for (const m of plan.materias.filter((x) => x.anio === anio)) {
+        grupo.append(new Option(`${m.cod} ${m.nombre}`, m.cod));
+      }
+      selMateria.append(grupo);
+    }
+  }
+
+  function sincronizar() {
+    const plan = planElegido();
+    escribir(selCarrera, plan ? plan.titulo : "elegí tu carrera", !plan);
+    escribir(selModo, selModo.selectedOptions[0].textContent, false);
+    const m = plan && plan.porCod.get(selMateria.value);
+    escribir(selMateria, m ? m.nombre : "elegí la materia", !m);
+  }
+
+  function limpiar() {
+    respuesta.hidden = true;
+    vaciar(respuesta);
+    error.textContent = "";
+    resumen.textContent = "";
+    for (const s of [selCarrera, selMateria]) {
+      s.removeAttribute("aria-invalid");
+      s.removeAttribute("aria-describedby");
+      s.parentElement.classList.remove("falta");
+    }
+  }
+
+  function falta(select, mensaje) {
+    error.textContent = mensaje;
+    select.setAttribute("aria-invalid", "true");
+    select.setAttribute("aria-describedby", "error");
+    select.parentElement.classList.add("falta");
+    select.focus();
+  }
+
+  const cuantas = (n) => (n === 1 ? "1 materia" : `${n} materias`);
+
+  function conCodigo(m) {
+    const f = document.createDocumentFragment();
+    f.append(el("span", "cod", m.cod), " ", m.nombre);
+    return f;
+  }
+
+  let trazos = 0;
+  function resaltada(m, tipo) {
+    const s = el("span", `res ${tipo}`, m.nombre);
+    s.style.animationDelay = `${120 + Math.min(trazos++, 12) * 55}ms`;
+    return s;
+  }
+
+  function lista(plan, cods, tipo, r) {
+    const ul = el("ul", "materias");
+    for (const c of cods) {
+      const m = plan.porCod.get(c);
+      const li = el("li");
+      const nombre = el("span");
+      nombre.append(resaltada(m, tipo));
+      li.append(el("span", "cod", m.cod), nombre);
+      li.dataset.cod = c;
+      li.dataset.pide = tipo;
+      if (r.solapadas.includes(c)) {
+        const otras = [...r.via.get(c)].filter((v) => r.via.has(v)).sort((a, b) => plan.orden.get(a) - plan.orden.get(b));
+        const quien = otras.map((v) => `${v} ${plan.porCod.get(v).nombre}`).join(" y ");
+        li.append(el("span", "aclaracion", `Es correlativa de la materia, pero además la pide ${quien}. Por eso va con final o promoción.`));
+      }
+      ul.append(li);
+    }
+    return ul;
+  }
+
+  function hilo(plan, cod, modo, r) {
+    const abiertas = new Set([cod]);
+    const rama = (padre, nivel) => {
+      const ul = el("ul");
+      for (const c of pedidas(plan, padre)) {
+        const m = plan.porCod.get(c);
+        const tipo = modo === "final" || nivel > 0 || r.atras.has(c) ? "final" : "concepto";
+        const li = el("li");
+        const fila = el("div", "fila");
+        const nombre = el("span", "", m.nombre);
+        nombre.append(el("span", "sr", ` (${TEXTO[tipo]})`));
+        fila.append(el("span", `marca ${tipo}`), el("span", "cod", m.cod), nombre);
+        li.append(fila);
+        li.dataset.cod = c;
+        li.dataset.pide = tipo;
+        if (pedidas(plan, c).length) {
+          if (abiertas.has(c)) {
+            nombre.append(" ", el("span", "repetida", "sigue igual que más arriba"));
+          } else {
+            abiertas.add(c);
+            li.append(rama(c, nivel + 1));
+          }
+        }
+        ul.append(li);
+      }
+      return ul;
+    };
+    const caja = el("div", "hilo");
+    const raiz = el("p", "raiz");
+    raiz.append(conCodigo(plan.porCod.get(cod)));
+    caja.append(raiz, rama(cod, 0));
+    return caja;
+  }
+
+  function mostrar(plan, cod, modo) {
+    const m = plan.porCod.get(cod);
+    const r = requisitos(plan, cod, modo);
+    trazos = 0;
+
+    const entrada = modo === "final" ? "Para rendir el final de" : "Para cursar";
+    const titulo = el("h2", "titulo");
+    titulo.append(el("span", "entrada", entrada), " ", conCodigo(m));
+    const partes = [titulo];
+    let dicho = `${entrada} ${m.cod} ${m.nombre} `;
+
+    if (!r.concepto.length && !r.final.length) {
+      partes.push(el("p", "nada", "no necesitás correlativas."));
+      dicho += "no necesitás correlativas.";
+    } else {
+      const pedidos = [];
+      if (r.concepto.length) pedidos.push(`el concepto aprobado de ${cuantas(r.concepto.length)}`);
+      if (r.final.length) pedidos.push(`el final o la promoción de ${cuantas(r.final.length)}`);
+      dicho += `necesitás ${pedidos.join(" y ")}. El detalle está a continuación.`;
+      if (r.concepto.length) {
+        partes.push(el("h3", "conector", "necesitás el concepto aprobado de"), lista(plan, r.concepto, "concepto", r));
+      }
+      if (r.final.length) {
+        const frase = r.concepto.length ? "y el final o la promoción de" : "necesitás el final o la promoción de";
+        partes.push(el("h3", "conector", frase), lista(plan, r.final, "final", r));
+      }
+
+      const leyenda = el("ul", "leyenda");
+      for (const tipo of modo === "final" ? ["final"] : ["concepto", "final"]) {
+        const li = el("li");
+        li.append(el("span", `marca ${tipo}`), TEXTO[tipo]);
+        leyenda.append(li);
+      }
+      partes.push(
+        el("h3", "sub", "El hilo completo"),
+        el("p", "regla", modo === "final"
+          ? "Para rendir el final, correlativas y precorrelativas van con final o promoción."
+          : "Las correlativas de la materia van con concepto aprobado. Las precorrelativas, que son las que piden esas correlativas, van con final o promoción."),
+        leyenda,
+        hilo(plan, cod, modo, r)
+      );
+    }
+
+    for (const c of [cod, ...r.concepto, ...r.final]) {
+      const aviso = plan.porCod.get(c).aviso;
+      if (!aviso) continue;
+      const p = el("p", "aviso");
+      p.append(el("strong", "", "Dato a confirmar."), " ", aviso);
+      partes.push(p);
+    }
+
+    partes.push(el("p", "fuente", `Según el plan de ${plan.titulo}. ${plan.resoluciones.map((x) => x + ".").join(" ")}`));
+
+    vaciar(respuesta);
+    respuesta.append(...partes);
+    respuesta.hidden = false;
+    resumen.textContent = dicho;
+
+    const caja = respuesta.getBoundingClientRect();
+    if (caja.top < 0 || caja.top > window.innerHeight * 0.55) {
+      const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      respuesta.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "start" });
+    }
+  }
+
+  function consultar() {
+    limpiar();
+    const plan = planElegido();
+    if (!plan) return falta(selCarrera, "Elegí tu carrera.");
+    if (!plan.porCod.has(selMateria.value)) {
+      return falta(selMateria, selModo.value === "final" ? "Elegí la materia que querés rendir." : "Elegí la materia que querés cursar.");
+    }
+    mostrar(plan, selMateria.value, selModo.value);
+  }
+
+  selCarrera.addEventListener("change", () => { llenarMaterias(); limpiar(); sincronizar(); });
+  selModo.addEventListener("change", () => { limpiar(); sincronizar(); });
+  selMateria.addEventListener("change", () => { limpiar(); sincronizar(); });
+  $("consulta").addEventListener("submit", (e) => { e.preventDefault(); consultar(); });
+  window.addEventListener("pageshow", sincronizar);
+
+  llenarCarreras();
+  llenarMaterias();
+  sincronizar();
+})();
+</script>
+</body>
+</html>
