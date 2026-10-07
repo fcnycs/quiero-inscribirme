@@ -184,7 +184,13 @@
     vertical-align: .12em;
   }
   .blanco.vacio { font-weight: 450; color: var(--tinta-suave); }
-  .blanco.inactivo { opacity: .55; box-shadow: none; }
+  /* Todavía no se puede elegir (falta la carrera): borde punteado y sin relieve, pero el texto se sigue leyendo bien. */
+  .blanco.inactivo {
+    border-style: dashed;
+    border-color: var(--tinta-suave);
+    background: rgba(255, 255, 255, .45);
+    box-shadow: none;
+  }
   .blanco.sigue { border-color: var(--verde-fcncs); box-shadow: 0 .1em 0 var(--verde-fcncs); }
   .blanco.falta { border-color: var(--rojo); box-shadow: 0 .1em 0 var(--rojo); }
   .blanco.listo { animation: listo .3s ease-out; }
@@ -307,6 +313,16 @@
     line-height: 1.4;
   }
 
+  /* Lo que el plan pide con palabras, tal cual está escrito. */
+  .indicacion {
+    max-width: 38em;
+    margin: .5rem 0 0;
+    padding: .1rem 0 .1rem .9rem;
+    border-left: 4px solid var(--tinta);
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
   .materias { list-style: none; margin: 0; padding: 0; }
   .materias li {
     display: grid;
@@ -419,6 +435,9 @@
   .pie { font-size: .8125rem; color: var(--tinta-suave); }
   .pie .hoja { padding-top: 1.1rem; padding-bottom: 1.75rem; }
   .pie p { margin: 0; max-width: 40em; }
+  .pie p + p { margin-top: .4rem; }
+  .pie a { color: var(--tinta); font-weight: 700; text-underline-offset: .15em; }
+  .pie a:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; }
 
   @media (max-width: 30rem) {
     .consultar { width: 100%; }
@@ -478,6 +497,7 @@
 <footer class="pie">
   <div class="hoja">
     <p>Esta página informa las correlativas según los planes de estudio cargados. No hace la inscripción ni reemplaza al plan de estudios oficial.</p>
+    <p>Para inscribirse ingresar a <a href="https://guarani.unp.edu.ar/unpata/" target="_blank" rel="noopener">SIU GUARANI</a>.</p>
   </div>
 </footer>
 
@@ -488,14 +508,171 @@
   /* =====================================================================
      PLANES DE ESTUDIO
      Para sumar una carrera, agregá otro bloque { ... } a esta lista.
+       carrera       el nombre que se elige en la lista.
+       titulo        el título que figura en el plan.
        cod           código de la materia en el plan, entre comillas y con el cero adelante.
        anio          año del plan al que pertenece (1, 2, 3...).
-       correlativas  los códigos de la columna "Correlatividades". Sin correlativas: [].
-       aviso         (opcional) texto que se muestra al consultar esa materia.
+       correlativas  los códigos de la columna de correlatividades. Sin correlativas: [].
+     Opcionales:
+       clave         nombre interno para lo que el plan lista sin código (va en lugar de cod).
+       grupo         título del grupo en la lista, para lo que no pertenece a un año.
+       requisito     lo que el plan pide con palabras; se muestra tal cual.
+       requisitoPorAnio  (a nivel del plan) un requisito escrito que vale para todas las materias de un año.
+       aviso         texto de "Dato a confirmar" que se muestra al consultar esa materia.
      ===================================================================== */
   const PLANES = [
     {
+      id: "enf",
+      carrera: "Enfermería",
+      titulo: "Enfermero/a",
+      resoluciones: [
+        "Resolución CDFCNyCS Nº 104/18",
+        "Resolución C.S. Nº 021/18",
+        "Resolución 2020-890-APN-ME"
+      ],
+      materias: [
+        { cod: "01", nombre: "Enfermería Básica",                        anio: 1, correlativas: [] },
+        { cod: "02", nombre: "Ciencias Biológicas",                      anio: 1, correlativas: [] },
+        { cod: "03", nombre: "Antropología",                             anio: 1, correlativas: [] },
+        { cod: "04", nombre: "Sociología I",                             anio: 1, correlativas: [] },
+        { cod: "05", nombre: "Filosofía I",                              anio: 1, correlativas: ["04"] },
+        { cod: "06", nombre: "Enfermería Comunitaria I",                 anio: 1, correlativas: ["03", "04"] },
+        { cod: "07", nombre: "Microbiología y Parasitología",            anio: 1, correlativas: [] },
+        { cod: "08", nombre: "Enfermería del Adulto y el Anciano",       anio: 2, correlativas: ["01", "02"] },
+        { cod: "09", nombre: "Enfermería Materno-Infantil",              anio: 2, correlativas: ["01", "02", "06"] },
+        { cod: "10", nombre: "Nutrición y Dietoterapia",                 anio: 2, correlativas: ["01", "02"] },
+        { cod: "11", nombre: "Epidemiología",                            anio: 2, correlativas: ["06"] },
+        { cod: "12", nombre: "Farmacología",                             anio: 2, correlativas: ["02", "07"] },
+        { cod: "13", nombre: "Psicología",                               anio: 2, correlativas: ["03", "04"] },
+        { cod: "14", nombre: "Ética y Deontología Profesional I",        anio: 2, correlativas: ["01", "05"] },
+        { cod: "15", nombre: "Enfermería del Niño y el Adolescente",     anio: 3, correlativas: ["09"] },
+        { cod: "16", nombre: "Enfermería en Salud Mental",               anio: 3, correlativas: ["08", "13"] },
+        { cod: "17", nombre: "Investigación en Enfermería I",            anio: 3, correlativas: ["08", "09"] },
+        { cod: "18", nombre: "Gestión de los Servicios de Enfermería Hospitalarios y Comunitarios I", anio: 3, correlativas: ["08", "09"] },
+        { cod: "19", nombre: "Práctica Integrada I",                     anio: 3, correlativas: ["09", "16"] },
+        { clave: "electivas", nombre: "Actividades Electivas",                    anio: 3, correlativas: [] }
+      ]
+    },
+    {
+      id: "geo",
+      carrera: "Geología",
+      titulo: "Geólogo",
+      resoluciones: [
+        "Resolución CDFCNyCS Nº 130/22",
+        "Resolución C.S. Nº 053/22",
+        "RESFC-2023-271-APN-CONEAU#ME"
+      ],
+      requisitoPorAnio: { 4: "La prueba de acreditación de idioma deberá ser aprobada antes del cursado de 4º año." },
+      materias: [
+        { cod: "01", nombre: "Geología General",                         anio: 1, correlativas: [] },
+        { cod: "02", nombre: "Matemática",                               anio: 1, correlativas: [] },
+        { cod: "03", nombre: "Química General",                          anio: 1, correlativas: [] },
+        { cod: "04", nombre: "Física",                                   anio: 1, correlativas: ["02"] },
+        { cod: "05", nombre: "Química Inorgánica",                       anio: 1, correlativas: ["03"] },
+        { cod: "06", nombre: "Paleontología",                            anio: 2, correlativas: ["01", "03"] },
+        { cod: "07", nombre: "Geoquímica General",                       anio: 2, correlativas: ["01", "04", "05"] },
+        { cod: "08", nombre: "Estadística",                              anio: 2, correlativas: ["02"] },
+        { cod: "09", nombre: "Mineralogía General",                      anio: 2, correlativas: ["01", "05"] },
+        { cod: "10", nombre: "Mineralogía Óptica",                       anio: 2, correlativas: ["04", "09"] },
+        { cod: "11", nombre: "Sedimentología",                           anio: 3, correlativas: ["06", "08", "10"] },
+        { cod: "12", nombre: "Petrología",                               anio: 3, correlativas: ["07", "10"] },
+        { cod: "13", nombre: "Geología Estructural",                     anio: 3, correlativas: ["10"] },
+        { cod: "14", nombre: "Geomorfología",                            anio: 3, correlativas: ["08", "09"] },
+        { cod: "15", nombre: "Suelos",                                   anio: 4, correlativas: ["11", "12"] },
+        { cod: "16", nombre: "Topografía y Carteo Geológico",            anio: 4, correlativas: ["11", "12", "13", "14"] },
+        { cod: "17", nombre: "Fotogeología y Teledetección",             anio: 4, correlativas: ["11", "12", "13", "14"] },
+        { cod: "18", nombre: "Hidrogeología",                            anio: 4, correlativas: ["11", "13", "14"] },
+        { cod: "19", nombre: "Geología Histórica y Estratigrafía",       anio: 4, correlativas: ["11", "12", "13", "14"] },
+        { cod: "20", nombre: "Geología de Yacimientos Minerales",        anio: 4, correlativas: ["11", "12", "13", "14"] },
+        { cod: "21", nombre: "Geoquímica Aplicada",                      anio: 5, correlativas: ["15", "18"] },
+        { cod: "22", nombre: "Geología Económica",                       anio: 5, correlativas: ["16", "19", "20"] },
+        { cod: "23", nombre: "Geología Aplicada a la Ingeniería y al Medio Ambiente", anio: 5, correlativas: ["16", "17", "18"] },
+        { cod: "24", nombre: "Geofísica General y Sísmica",              anio: 5, correlativas: ["16", "19"] },
+        { cod: "25", nombre: "Geología de Yacimientos Combustibles",     anio: 5, correlativas: ["16", "18", "19", "20"] },
+        { cod: "26", nombre: "Geología Argentina",                       anio: 5, correlativas: ["16", "17", "19", "20"] },
+        { clave: "seminario", nombre: "Seminario de Campo",                       grupo: "Otros requisitos", correlativas: [],
+          requisito: "Tener aprobadas todas las materias de 2º año y el concepto de Sedimentología, Petrología, Geomorfología y Geología Estructural. Asimismo, los/las alumnos/as deberán estar cursando o tener los conceptos de Topografía y Carteo Geológico y de Fotogeología y Teledetección. Reglamento en Anexo I." },
+        { clave: "trabajo-final", nombre: "Trabajo Final",                            grupo: "Otros requisitos", correlativas: [],
+          requisito: "Para iniciarlo formalmente los/las alumnos/as deberán poseer todas las materias de 3º año aprobadas y haber obtenido el concepto de todas las asignaturas de 4º año. Para la defensa del trabajo final deberán tener todas las materias de la carrera aprobadas. Reglamento en Anexo II." },
+        { clave: "ingles", nombre: "Prueba de Acreditación de Conocimientos Básicos de Inglés", grupo: "Otros requisitos", correlativas: [],
+          requisito: "La prueba de acreditación de idioma deberá ser aprobada antes del cursado de 4º año." }
+      ]
+    },
+    {
+      id: "lq",
+      carrera: "Licenciatura en Química",
+      titulo: "Licenciado en Química",
+      resoluciones: [
+        "Resolución CDFCNyCS Nº 131/22",
+        "Resolución C.S. Nº 052/22",
+        "RESFC-2023-292-APN-CONEAU#ME"
+      ],
+      materias: [
+        { cod: "01", nombre: "Matemática I",                         anio: 1, correlativas: [] },
+        { cod: "02", nombre: "Química General",                      anio: 1, correlativas: [] },
+        { cod: "03", nombre: "Prácticas del Laboratorio Químico",    anio: 1, correlativas: [] },
+        { cod: "04", nombre: "Matemática II",                        anio: 1, correlativas: ["01"] },
+        { cod: "05", nombre: "Química Inorgánica",                   anio: 1, correlativas: ["02", "03"] },
+        { cod: "06", nombre: "Física I",                             anio: 1, correlativas: ["01"] },
+        { cod: "07", nombre: "Física II",                            anio: 2, correlativas: ["04", "06"] },
+        { cod: "08", nombre: "Química Orgánica I",                   anio: 2, correlativas: ["05"] },
+        { cod: "09", nombre: "Estadística",                          anio: 2, correlativas: ["01"] },
+        { cod: "10", nombre: "Química Orgánica II",                  anio: 2, correlativas: ["08"] },
+        { cod: "11", nombre: "Química Ambiental",                    anio: 2, correlativas: ["08"] },
+        { cod: "12", nombre: "Inglés",                               anio: 2, correlativas: [] },
+        { cod: "13", nombre: "Química Biológica General",            anio: 3, correlativas: ["10"] },
+        { cod: "14", nombre: "Fisicoquímica I",                      anio: 3, correlativas: ["05", "07"] },
+        { cod: "15", nombre: "Química Analítica I",                  anio: 3, correlativas: ["09", "10"] },
+        { cod: "16", nombre: "Fisicoquímica II",                     anio: 3, correlativas: ["09", "14"] },
+        { cod: "17", nombre: "Química Analítica II",                 anio: 3, correlativas: ["15"] },
+        { cod: "18", nombre: "Química de los Polímeros",             anio: 3, correlativas: ["13"] },
+        { cod: "19", nombre: "Química Inorgánica Avanzada",          anio: 4, correlativas: ["16"] },
+        { cod: "20", nombre: "Quimiometría",                         anio: 4, correlativas: ["17"] },
+        { cod: "21", nombre: "Química Orgánica III",                 anio: 4, correlativas: ["18"] },
+        { cod: "22", nombre: "Fisicoquímica III",                    anio: 4, correlativas: ["16"] },
+        { cod: "23", nombre: "Química Analítica Instrumental",       anio: 4, correlativas: ["20"] },
+        { cod: "24", nombre: "Química de las Energías Renovables",   anio: 4, correlativas: ["13", "18"] },
+        { cod: "25", nombre: "Procesos Industriales",                anio: 4, correlativas: ["19"] },
+        { cod: "26", nombre: "Química Orgánica IV",                  anio: 5, correlativas: ["21", "23"] },
+        { cod: "27", nombre: "Modelado Molecular",                   anio: 5, correlativas: ["21", "22"] },
+        { cod: "28", nombre: "Optativa",                             anio: 5, correlativas: [] },
+        { cod: "29", nombre: "Optativa",                             anio: 5, correlativas: [] },
+        { cod: "30", nombre: "Trabajo Final",                        anio: 5, correlativas: [],
+          requisito: "Para cursar el Trabajo Final el alumno debe tener aprobado hasta 4º año y estar cursando una asignatura de 5º año." }
+      ]
+    },
+    {
+      id: "tupa",
+      carrera: "Técnico Universitario en Protección Ambiental",
+      titulo: "Técnico Universitario en Protección Ambiental",
+      resoluciones: [
+        "Resolución CAFCN Nº 436/01 - Resolución CAFCN Nº 343/08",
+        "Resolución C.S. Nº 008/03 - C.S. Nº 017/09",
+        "Resolución de Ministerio de Educación, Ciencia y Tecnología Nº 378/03"
+      ],
+      materias: [
+        { cod: "01", nombre: "Matemática I",                           anio: 1, correlativas: [] },
+        { cod: "02", nombre: "Química General",                        anio: 1, correlativas: [] },
+        { cod: "03", nombre: "Geología y Geomorfología",               anio: 1, correlativas: [] },
+        { cod: "04", nombre: "Química Orgánica",                       anio: 1, correlativas: ["02"] },
+        { cod: "05", nombre: "Física I",                               anio: 1, correlativas: ["01"] },
+        { cod: "06", nombre: "Química Analítica General",              anio: 2, correlativas: ["02"] },
+        { cod: "07", nombre: "Química Biológica",                      anio: 2, correlativas: ["04"] },
+        { cod: "08", nombre: "Botánica General",                       anio: 2, correlativas: [] },
+        { cod: "09", nombre: "Suelos e Hidrología",                    anio: 2, correlativas: ["03", "05"] },
+        { cod: "10", nombre: "Zoología General",                       anio: 2, correlativas: [] },
+        { cod: "11", nombre: "Meteorología y Climatología",            anio: 2, correlativas: ["05"] },
+        { cod: "12", nombre: "Procesos Industriales",                  anio: 3, correlativas: ["05", "07"] },
+        { cod: "13", nombre: "Estadística",                            anio: 3, correlativas: ["01"] },
+        { cod: "14", nombre: "Microbiología Ambiental",                anio: 3, correlativas: ["07"] },
+        { cod: "15", nombre: "Contaminación y Tratamiento del Aire",   anio: 3, correlativas: ["04", "05", "06"] },
+        { cod: "16", nombre: "Contaminación de Suelos y Aguas",        anio: 3, correlativas: ["04", "06", "09"] },
+        { cod: "17", nombre: "Introducción a la Ecología",             anio: 3, correlativas: ["03", "08", "10", "13"] }
+      ]
+    },
+    {
       id: "tuq",
+      carrera: "Técnico Universitario en Química",
       titulo: "Técnico Universitario en Química",
       resoluciones: [
         "Resolución CAFCN Nº 163/96 - 304/96 - 303/07 - CDFCN Nº 314/09",
@@ -503,24 +680,24 @@
         "Resolución Ministerio de Cultura y Educación Nº 1904/97"
       ],
       materias: [
-        { cod: "01", nombre: "Matemática I",                        anio: 1, correlativas: [] },
-        { cod: "02", nombre: "Química General",                     anio: 1, correlativas: [] },
-        { cod: "03", nombre: "Prácticas del Laboratorio Químico",   anio: 1, correlativas: [] },
-        { cod: "04", nombre: "Matemática II",                       anio: 1, correlativas: ["01"] },
-        { cod: "05", nombre: "Química Inorgánica",                  anio: 1, correlativas: ["02", "03"] },
-        { cod: "06", nombre: "Física I",                            anio: 1, correlativas: ["01"] },
-        { cod: "07", nombre: "Física II",                           anio: 2, correlativas: ["04", "06"] },
-        { cod: "08", nombre: "Química Orgánica I",                  anio: 2, correlativas: ["05"] },
-        { cod: "09", nombre: "Estadística",                         anio: 2, correlativas: ["01"] },
-        { cod: "10", nombre: "Química Orgánica II",                 anio: 2, correlativas: ["08"] },
-        { cod: "11", nombre: "Química Ambiental",                   anio: 2, correlativas: ["08"] },
-        { cod: "12", nombre: "Seminario de Manejo de Bibliografía", anio: 2, correlativas: ["02"] },
-        { cod: "13", nombre: "Química Biológica General",           anio: 3, correlativas: ["10"] },
-        { cod: "14", nombre: "Fisicoquímica",                       anio: 3, correlativas: ["05", "07"],
+        { cod: "01", nombre: "Matemática I",                          anio: 1, correlativas: [] },
+        { cod: "02", nombre: "Química General",                       anio: 1, correlativas: [] },
+        { cod: "03", nombre: "Prácticas del Laboratorio Químico",     anio: 1, correlativas: [] },
+        { cod: "04", nombre: "Matemática II",                         anio: 1, correlativas: ["01"] },
+        { cod: "05", nombre: "Química Inorgánica",                    anio: 1, correlativas: ["02", "03"] },
+        { cod: "06", nombre: "Física I",                              anio: 1, correlativas: ["01"] },
+        { cod: "07", nombre: "Física II",                             anio: 2, correlativas: ["04", "06"] },
+        { cod: "08", nombre: "Química Orgánica I",                    anio: 2, correlativas: ["05"] },
+        { cod: "09", nombre: "Estadística",                           anio: 2, correlativas: ["01"] },
+        { cod: "10", nombre: "Química Orgánica II",                   anio: 2, correlativas: ["08"] },
+        { cod: "11", nombre: "Química Ambiental",                     anio: 2, correlativas: ["08"] },
+        { cod: "12", nombre: "Seminario de Manejo de Bibliografía",   anio: 2, correlativas: ["02"] },
+        { cod: "13", nombre: "Química Biológica General",             anio: 3, correlativas: ["10"] },
+        { cod: "14", nombre: "Fisicoquímica",                         anio: 3, correlativas: ["05", "07"],
           aviso: "En el plan escaneado, la segunda correlativa de Fisicoquímica está corregida a mano. Se cargó como 07 Física II." },
-        { cod: "15", nombre: "Química Analítica I",                 anio: 3, correlativas: ["09", "10"] },
-        { cod: "16", nombre: "Química Analítica II",                anio: 3, correlativas: ["15"] },
-        { cod: "17", nombre: "Inglés",                              anio: 3, correlativas: [] }
+        { cod: "15", nombre: "Química Analítica I",                   anio: 3, correlativas: ["09", "10"] },
+        { cod: "16", nombre: "Química Analítica II",                  anio: 3, correlativas: ["15"] },
+        { cod: "17", nombre: "Inglés",                                anio: 3, correlativas: [] }
       ]
     }
   ];
@@ -534,11 +711,15 @@
      Si una materia es correlativa directa y además la pide otra materia del hilo, va con final. */
 
   for (const plan of PLANES) {
-    plan.porCod = new Map(plan.materias.map((m) => [m.cod, m]));
-    plan.orden = new Map(plan.materias.map((m, i) => [m.cod, i]));
+    for (const m of plan.materias) {
+      if (!m.clave) m.clave = m.cod;
+      if (!m.requisito && plan.requisitoPorAnio && plan.requisitoPorAnio[m.anio]) m.requisito = plan.requisitoPorAnio[m.anio];
+    }
+    plan.porCod = new Map(plan.materias.map((m) => [m.clave, m]));
+    plan.orden = new Map(plan.materias.map((m, i) => [m.clave, i]));
     for (const m of plan.materias) {
       for (const c of m.correlativas) {
-        if (!plan.porCod.has(c)) console.warn(`${plan.titulo}: la ${m.cod} pide la ${c}, que no está en el plan.`);
+        if (!plan.porCod.has(c)) console.warn(`${plan.carrera}: la ${m.clave} pide la ${c}, que no está en el plan.`);
       }
     }
   }
@@ -630,7 +811,7 @@
   function llenarCarreras() {
     vaciar(selCarrera);
     if (PLANES.length !== 1) selCarrera.append(new Option("elegí tu carrera", ""));
-    for (const p of PLANES) selCarrera.append(new Option(p.titulo, p.id));
+    for (const p of PLANES) selCarrera.append(new Option(p.carrera, p.id));
   }
 
   function llenarMaterias() {
@@ -639,14 +820,16 @@
     selMateria.append(new Option("elegí la materia", ""));
     selMateria.disabled = !plan;
     if (!plan) return;
-    const anios = [...new Set(plan.materias.map((m) => m.anio))].sort((a, b) => a - b);
-    for (const anio of anios) {
-      const grupo = document.createElement("optgroup");
-      grupo.label = `${ANIOS[anio - 1] || anio + "º"} año`;
-      for (const m of plan.materias.filter((x) => x.anio === anio)) {
-        grupo.append(new Option(`${m.cod} ${m.nombre}`, m.cod));
+    // Un grupo por año, en el orden del plan; lo que no es de un año va con su propio título.
+    let grupo = null;
+    for (const m of plan.materias) {
+      const rotulo = m.grupo || `${ANIOS[m.anio - 1] || m.anio + "º"} año`;
+      if (!grupo || grupo.label !== rotulo) {
+        grupo = document.createElement("optgroup");
+        grupo.label = rotulo;
+        selMateria.append(grupo);
       }
-      selMateria.append(grupo);
+      grupo.append(new Option(conNumero(m), m.clave));
     }
   }
 
@@ -664,7 +847,7 @@
 
   function sincronizar() {
     const plan = planElegido();
-    escribir(selCarrera, plan ? plan.titulo : "elegí tu carrera", !plan);
+    escribir(selCarrera, plan ? plan.carrera : "elegí tu carrera", !plan);
     escribir(selModo, selModo.selectedOptions[0].textContent, false);
     const m = plan && plan.porCod.get(selMateria.value);
     escribir(selMateria, m ? m.nombre : "elegí la materia", !m);
@@ -702,9 +885,12 @@
 
   const cuantas = (n) => (n === 1 ? "1 materia" : `${n} materias`);
 
+  const conNumero = (m) => (m.cod ? `${m.cod} ${m.nombre}` : m.nombre);
+
   function conCodigo(m) {
     const f = document.createDocumentFragment();
-    f.append(el("span", "cod", m.cod), " ", m.nombre);
+    if (m.cod) f.append(el("span", "cod", m.cod), " ");
+    f.append(m.nombre);
     return f;
   }
 
@@ -778,9 +964,13 @@
     const titulo = el("h2", "titulo");
     titulo.append(el("span", "entrada", entrada), " ", conCodigo(m));
     const partes = [titulo];
-    let dicho = `${entrada} ${m.cod} ${m.nombre} `;
+    let dicho = `${entrada} ${conNumero(m)} `;
 
-    if (!r.concepto.length && !r.final.length) {
+    if (!r.concepto.length && !r.final.length && m.requisito) {
+      // Sin correlativas con código: lo que vale es lo que el plan pide con palabras.
+      partes.push(el("h3", "conector", "el plan indica:"), el("p", "indicacion", m.requisito));
+      dicho += `el plan indica: ${m.requisito}`;
+    } else if (!r.concepto.length && !r.final.length) {
       partes.push(el("p", "nada", "no necesitás correlativas."));
       dicho += "no necesitás correlativas.";
     } else {
@@ -794,6 +984,10 @@
       if (r.final.length) {
         const frase = r.concepto.length ? "y el final o la promoción de" : "necesitás el final o la promoción de";
         partes.push(el("h3", "conector", frase), lista(plan, r.final, "final", r));
+      }
+      if (m.requisito) {
+        partes.push(el("h3", "conector", "y además, el plan indica:"), el("p", "indicacion", m.requisito));
+        dicho += " El plan indica además otro requisito.";
       }
 
       const leyenda = el("ul", "leyenda");
@@ -820,7 +1014,8 @@
       partes.push(p);
     }
 
-    partes.push(el("p", "fuente", `Según el plan de ${plan.titulo}. ${plan.resoluciones.map((x) => x + ".").join(" ")}`));
+    const otorga = plan.titulo && plan.titulo !== plan.carrera ? ` (título: ${plan.titulo})` : "";
+    partes.push(el("p", "fuente", `Según el plan de ${plan.carrera}${otorga}. ${plan.resoluciones.map((x) => x + ".").join(" ")}`));
 
     vaciar(detalle);
     detalle.append(...partes);
