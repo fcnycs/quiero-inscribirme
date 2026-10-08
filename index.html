@@ -105,28 +105,16 @@
   .portada .hoja {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding-top: .7rem;
     padding-bottom: .7rem;
   }
-  .uni {
-    display: flex;
-    flex: none;
-    align-items: center;
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: .03em;
-    line-height: 1;
-  }
-  .uni img { width: 2.25rem; height: auto; margin-right: .6rem; }
+  /* El logo de la facultad, a la izquierda. */
   .facu {
     flex: 0 1 15.5rem;
     min-width: 0;
-    margin-left: 1rem;
     font-size: 1.1875rem;   /* solo se ve si el logo no carga */
     font-weight: 800;
     line-height: 1.2;
-    text-align: right;
   }
   .facu img { display: block; width: 100%; height: auto; }
 
@@ -436,12 +424,34 @@
   .pie { font-size: .8125rem; color: var(--tinta-suave); }
   .pie .hoja { padding-top: 1.1rem; padding-bottom: 1.75rem; }
   .pie p { margin: 0; max-width: 40em; }
-  .pie p + p { margin-top: .4rem; }
-  .pie a { color: var(--tinta); font-weight: 700; text-underline-offset: .15em; }
+  /* Última línea del pie: el enlace a SIU Guaraní y, a la derecha, la universidad: primero las letras y después el logo. */
+  .pie .firma {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: .4rem;
+  }
+  .uni {
+    display: flex;
+    flex: none;
+    align-items: center;
+    color: var(--tinta);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    line-height: 1;
+  }
+  .uni img { width: 1.75rem; height: auto; margin-left: .45rem; }
+  .pie a { color: var(--tinta); font-weight: 700; text-underline-offset: .15em; white-space: nowrap; }
   .pie a:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; }
 
   @media (max-width: 30rem) {
     .consultar { width: 100%; }
+    /* En el celular la universidad ocupa un poco menos, así la línea de SIU Guaraní entra entera en casi todas las pantallas. */
+    .pie .firma { gap: .75rem; }
+    .uni { font-size: .875rem; }
+    .uni img { width: 1.5rem; margin-left: .4rem; }
   }
   /* Pantallas muy angostas: los hilos de muchos niveles (Medicina llega a ocho) entran menos en cada paso. */
   @media (max-width: 21.5rem) {
@@ -459,10 +469,6 @@
 
 <header class="portada">
   <div class="hoja">
-    <div class="uni">
-      <img src="https://fcnycs.github.io/mesas-examen/logo_s.png" alt="Universidad Nacional de la Patagonia San Juan Bosco" width="36" height="45" onerror="this.remove()">
-      <span>UNPSJB</span>
-    </div>
     <!-- El logo va en la misma carpeta que esta página. Si no está, queda el nombre en texto. -->
     <div class="facu"><img src="logo-fcncs.png" alt="FCNCS, Facultad de Ciencias Naturales y Ciencias de la Salud" width="913" height="264" onerror="this.parentNode.textContent='Facultad de Ciencias Naturales y Ciencias de la Salud'"></div>
   </div>
@@ -502,7 +508,13 @@
 <footer class="pie">
   <div class="hoja">
     <p>Esta página informa las correlativas según los planes de estudio cargados. No hace la inscripción ni reemplaza al plan de estudios oficial.</p>
-    <p>Para inscribirse ingresar a <a href="https://guarani.unp.edu.ar/unpata/" target="_blank" rel="noopener">SIU GUARANI</a>.</p>
+    <div class="firma">
+      <p>Para inscribirse ingresar a <a href="https://guarani.unp.edu.ar/unpata/" target="_blank" rel="noopener">SIU GUARANI</a>.</p>
+      <div class="uni">
+        <span>UNPSJB</span>
+        <img src="https://fcnycs.github.io/mesas-examen/logo_s.png" alt="Universidad Nacional de la Patagonia San Juan Bosco" width="36" height="45" onerror="this.remove()">
+      </div>
+    </div>
   </div>
 </footer>
 
