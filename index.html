@@ -17,37 +17,55 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
 
 <script>
-  /* Fondo de la página: un color suave distinto en cada carga, siguiendo el orden del arcoíris.
-     Para cambiar los colores, editá esta lista. */
+  /* Fondo de la página: una imagen distinta en cada carga, siempre en este orden.
+     Las imágenes están en la carpeta "fondos". Cada una lleva su tono oscuro, que se ve mientras carga
+     (y, en pantallas anchas, alrededor de la imagen). Para sumar o sacar imágenes, editá esta lista. */
   (function () {
-    var COLORES = [
-      "#ffe1e8",  // rosa
-      "#ffe7d3",  // durazno
-      "#fff4c2",  // amarillo
-      "#ddf3de",  // verde
-      "#d9ecfb",  // celeste
-      "#e9e1fa"   // lila
+    var FONDOS = [
+      ["01", "#0d1709"],  // hoja (verde)
+      ["02", "#07070c"],  // ADN (azul)
+      ["03", "#3f3247"],  // montañas (violeta)
+      ["04", "#0e0905"],  // microscopio (cobre)
+      ["05", "#1a0c08"],  // anatomía (carmesí)
+      ["06", "#0f190e"],  // placa de Petri (verde)
+      ["07", "#0a080e"],  // planeta (índigo)
+      ["08", "#021213"],  // vara de Asclepio (turquesa)
+      ["09", "#080f07"],  // nervaduras de una hoja (verde)
+      ["10", "#27121c"]   // células (magenta)
     ];
-    // Recuerda el último color usado para no repetirlo: primero en el navegador y, si no se puede, en la pestaña.
+    // Recuerda la última imagen para no repetirla: primero en el navegador y, si no se puede, en la pestaña.
     var anterior = NaN;
     try { anterior = parseInt(localStorage.getItem("qi-fondo"), 10); } catch (e) {}
     if (isNaN(anterior)) {
       try { anterior = parseInt(history.state && history.state.qiFondo, 10); } catch (e) {}
     }
-    var i = isNaN(anterior) ? Math.floor(Math.random() * COLORES.length) : (anterior + 1) % COLORES.length;
+    var i = isNaN(anterior) ? Math.floor(Math.random() * FONDOS.length) : (anterior + 1) % FONDOS.length;
     try { localStorage.setItem("qi-fondo", String(i)); } catch (e) {}
     try { history.replaceState(Object.assign({}, history.state, { qiFondo: i }), ""); } catch (e) {}
-    document.documentElement.style.setProperty("--papel", COLORES[i]);
+    var url = "fondos/" + FONDOS[i][0] + ".jpg";
+    var raiz = document.documentElement.style;
+    raiz.setProperty("--fondo-img", 'url("' + url + '")');
+    raiz.setProperty("--fondo-tono", FONDOS[i][1]);
+    try {   // que la imagen empiece a bajar cuanto antes
+      var l = document.createElement("link");
+      l.rel = "preload";
+      l.as = "image";
+      l.href = url;
+      document.head.appendChild(l);
+    } catch (e) {}
   })();
 </script>
 
 <style>
   :root {
-    --papel: #ffe1e8;        /* fondo de la página: lo cambia el script de arriba en cada carga */
+    --fondo-img: none;       /* imagen de fondo: la elige el script de arriba en cada carga */
+    --fondo-tono: #0d1709;   /* y su tono oscuro */
     --blanco: #ffffff;
     --tinta: #1a2466;        /* azul birome: todo el texto */
     --tinta-suave: #4f5885;  /* texto secundario */
-    --verde-fcncs: #1a8f5a;  /* el verde del logo de la facultad: es el mismo valor, así el logo no deja marca */
+    --verde-fcncs: #1a8f5a;  /* el verde del logo de la facultad */
+    --verde-velo: rgba(26, 143, 90, .88);   /* el mismo verde con un 12 % de transparencia: la portada */
+    --verde-pie: rgba(22, 125, 78, .88);    /* en el pie, un punto más oscuro: así la letra chica en blanco se lee bien */
     --amarillo: #ffe84a;     /* resaltador: concepto aprobado */
     --agua: #86e8cf;         /* resaltador: final o promoción */
     --rojo: #b3202c;         /* lo que falta completar o confirmar */
@@ -67,13 +85,57 @@
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
-    background: var(--papel);
+    background: var(--fondo-tono);
     color: var(--tinta);
     font-family: var(--fuente);
     font-size: 1.0625rem;
     line-height: 1.5;
   }
   main { flex: 1 0 auto; }
+
+  /* ---------- La imagen de fondo: fija detrás de todo ---------- */
+
+  .fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100vh;
+    height: 100lvh;   /* en el celular no cambia de tamaño cuando aparece o se va la barra del navegador */
+    overflow: hidden;
+    background: var(--fondo-tono);
+    pointer-events: none;
+  }
+  /* Celular y pantallas verticales: la imagen ocupa todo, con un velo oscuro más fuerte arriba, donde va la pregunta. */
+  .fondo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(0, 0, 0, .5), rgba(0, 0, 0, .45) 70%, rgba(0, 0, 0, .22) 90%, rgba(0, 0, 0, .3)),
+      var(--fondo-img) center / cover no-repeat;
+  }
+  /* Pantallas horizontales: la imagen entera a la derecha y, alrededor, la misma imagen desenfocada y más oscura. */
+  @media (min-aspect-ratio: 1/1) {
+    .fondo::before {
+      content: "";
+      position: absolute;
+      inset: -8%;
+      background: var(--fondo-img) center / cover no-repeat;
+      filter: blur(40px) brightness(.5) saturate(1.15);
+    }
+    .fondo::after {
+      left: auto;
+      width: 39.3vh;
+      background: linear-gradient(rgba(0, 0, 0, .18), rgba(0, 0, 0, .18)), var(--fondo-img) center / cover no-repeat;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 28%);
+      mask-image: linear-gradient(to right, transparent, #000 28%);
+    }
+    @supports (aspect-ratio: 1 / 1) {
+      .fondo::after { width: auto; aspect-ratio: 735 / 1870; }
+    }
+  }
 
   .sr {
     position: absolute;
@@ -98,7 +160,7 @@
   /* ---------- Portada ---------- */
 
   .portada {
-    background: var(--verde-fcncs);
+    background: var(--verde-velo);
     border-bottom: .3rem solid #000;
     color: #fff;
   }
@@ -120,6 +182,9 @@
 
   /* ---------- La frase ---------- */
 
+  /* Sobre la imagen el texto va en blanco, con una sombra suave que lo despega del fondo. */
+  .pregunta { color: #fff; }
+  .pregunta h1, .frase, .pregunta .error { text-shadow: 0 1px 2px rgba(0, 0, 0, .55), 0 0 1.1em rgba(0, 0, 0, .4); }
   .pregunta .hoja { padding-top: 1.75rem; padding-bottom: 2.5rem; }
   @supports (width: clamp(1px, 2px, 3px)) {
     .pregunta .hoja { padding-top: clamp(1.25rem, 4vw, 2.25rem); padding-bottom: clamp(2.25rem, 6vw, 3.5rem); }
@@ -158,6 +223,8 @@
     border-radius: .3em;
     background: var(--blanco);
     box-shadow: 0 .1em 0 var(--tinta);
+    color: var(--tinta);
+    text-shadow: none;
     font-weight: 750;
     line-height: 1.22;
     white-space: normal;
@@ -172,12 +239,14 @@
     vertical-align: .12em;
   }
   .blanco.vacio { font-weight: 450; color: var(--tinta-suave); }
-  /* Todavía no se puede elegir (falta la carrera): borde punteado y sin relieve, pero el texto se sigue leyendo bien. */
+  /* Todavía no se puede elegir (falta la carrera): un recuadro "vacío", de borde punteado, que deja ver la imagen. */
   .blanco.inactivo {
     border-style: dashed;
-    border-color: var(--tinta-suave);
-    background: rgba(255, 255, 255, .45);
+    border-color: rgba(255, 255, 255, .85);
+    background: rgba(255, 255, 255, .14);
     box-shadow: none;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .55);
   }
   .blanco.sigue { border-color: var(--verde-fcncs); box-shadow: 0 .1em 0 var(--verde-fcncs); }
   .blanco.falta { border-color: var(--rojo); box-shadow: 0 .1em 0 var(--rojo); }
@@ -200,10 +269,10 @@
   }
   .blanco select:disabled { cursor: not-allowed; }
 
-  .blanco:focus-within { outline: 3px solid var(--tinta); outline-offset: 3px; }
+  .blanco:focus-within { outline: 3px solid #fff; outline-offset: 3px; }
   @supports selector(:has(a)) {
     .blanco:focus-within { outline: none; }
-    .blanco:has(select:focus-visible) { outline: 3px solid var(--tinta); outline-offset: 3px; }
+    .blanco:has(select:focus-visible) { outline: 3px solid #fff; outline-offset: 3px; }
   }
 
   .consultar {
@@ -213,17 +282,17 @@
     padding: .85em 2em;
     border: 0;
     border-radius: .55rem;
-    background: var(--tinta);
-    box-shadow: 0 .22rem 0 #0a0f33;
+    background: var(--verde-fcncs);
+    box-shadow: 0 .22rem 0 #0b4a2e;
     color: #fff;
     font: 700 1.1875rem/1 var(--fuente);
     cursor: pointer;
   }
   @media (hover: hover) {
-    .consultar:hover { background: #111a4d; }
+    .consultar:hover { background: #167a4d; }
   }
-  .consultar:active { transform: translateY(.12rem); box-shadow: 0 .1rem 0 #0a0f33; }
-  .consultar:focus-visible { outline: 3px solid var(--tinta); outline-offset: 4px; }
+  .consultar:active { transform: translateY(.12rem); box-shadow: 0 .1rem 0 #0b4a2e; }
+  .consultar:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
 
   /* Flecha guía: se apoya en la esquina del próximo paso (el recuadro que falta o el botón). */
   .sigue::before {
@@ -247,8 +316,12 @@
   }
 
   .error {
+    display: table;   /* tan ancho como el mensaje */
     margin: 1rem 0 0;
-    color: var(--rojo);
+    padding: .3em .7em;
+    border-radius: .4em;
+    background: rgba(0, 0, 0, .7);   /* el aviso lleva su propio fondo oscuro, así se lee sobre cualquier imagen */
+    color: #ffc9cf;
     font-weight: 600;
   }
   .error:empty { display: none; }
@@ -421,7 +494,13 @@
     color: var(--tinta-suave);
   }
 
-  .pie { font-size: .8125rem; color: var(--tinta-suave); }
+  .pie {
+    background: var(--verde-pie);
+    border-top: .3rem solid #000;
+    color: #fff;
+    font-size: .8125rem;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
+  }
   .pie .hoja { padding-top: 1.1rem; padding-bottom: 1.75rem; }
   .pie p { margin: 0; max-width: 40em; }
   /* Última línea del pie: el enlace a SIU Guaraní y, a la derecha, la universidad: primero las letras y después el logo. */
@@ -436,15 +515,15 @@
     display: flex;
     flex: none;
     align-items: center;
-    color: var(--tinta);
+    color: #fff;
     font-size: 1rem;
     font-weight: 800;
     letter-spacing: .03em;
     line-height: 1;
   }
   .uni img { width: 1.75rem; height: auto; margin-left: .45rem; }
-  .pie a { color: var(--tinta); font-weight: 700; text-underline-offset: .15em; white-space: nowrap; }
-  .pie a:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; }
+  .pie a { color: #fff; font-weight: 700; text-underline-offset: .15em; white-space: nowrap; }
+  .pie a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 
   @media (max-width: 30rem) {
     .consultar { width: 100%; }
@@ -466,6 +545,8 @@
 </style>
 </head>
 <body>
+
+<div class="fondo" aria-hidden="true"></div>
 
 <header class="portada">
   <div class="hoja">
