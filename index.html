@@ -480,6 +480,20 @@
   .hilo .cod { margin-right: .4em; color: var(--tinta-suave); }
   .hilo .repetida { display: block; font-size: .875rem; color: var(--tinta-suave); }
 
+  /* "¿Vas por la promoción?": en la respuesta de cursar, qué correlativas pasan de concepto a final o promoción. */
+  .promocion {
+    max-width: 38em;
+    margin: 1.75rem 0 0;
+    padding: .8rem 1.1rem .9rem;
+    border: 2px solid var(--tinta);
+    border-radius: .55rem;
+    background: var(--blanco);
+    box-shadow: 0 .22rem 0 var(--tinta);
+  }
+  .promocion p { margin: 0; font-size: 1.0625rem; line-height: 1.5; }
+  .promocion .pregunta-promo { margin-bottom: .2rem; font-size: 1.1875rem; font-weight: 750; }
+  .promocion .cod { color: var(--tinta-suave); }
+
   .aviso {
     margin: 2rem 0 0;
     padding-left: .9rem;
@@ -1226,6 +1240,8 @@
      Para cursar: concepto aprobado de las correlativas de la materia, y final o promoción
      de las precorrelativas (todo lo que piden esas correlativas, hasta el principio del hilo).
      Para rendir final: final o promoción de todo el hilo.
+     Para cursar con la idea de promocionar: también todo el hilo con final o promoción (lo dice el recuadro
+     "¿Vas por la promoción?" de la respuesta de cursar).
      Si una materia es correlativa directa y además la pide otra materia del hilo, va con final. */
 
   for (const plan of PLANES) {
@@ -1506,6 +1522,24 @@
       if (m.requisito) {
         partes.push(el("h3", "conector", "y además, el plan indica:"), el("p", "indicacion", m.requisito));
         dicho += " El plan indica además otro requisito.";
+      }
+      // Para cursar con la idea de promocionar, las correlativas también van con final o promoción
+      // (todo el hilo, como para rendir el final): se avisa cuáles cambian.
+      if (modo !== "final" && r.concepto.length) {
+        const caja = el("div", "promocion");
+        const texto = el("p");
+        texto.append("Si la materia se puede promocionar, también necesitás el final o la promoción de ");
+        r.concepto.forEach((c, i) => {
+          if (i) texto.append(i === r.concepto.length - 1 ? " y " : ", ");
+          const mc = plan.porCod.get(c);
+          if (mc.cod) texto.append(el("span", "cod", mc.cod), " ");
+          texto.append(resaltada(mc, "final"));
+        });
+        texto.append(r.final.length ? ". El resto ya figura con final o promoción." : ".");
+        caja.append(el("p", "pregunta-promo", "¿Vas por la promoción?"), texto);
+        partes.push(caja);
+        const nombres = r.concepto.map((c) => conNumero(plan.porCod.get(c)));
+        dicho += ` Si vas por la promoción, también necesitás el final o la promoción de ${nombres.length > 1 ? nombres.slice(0, -1).join(", ") + " y " + nombres[nombres.length - 1] : nombres[0]}.`;
       }
 
       const leyenda = el("ul", "leyenda");
